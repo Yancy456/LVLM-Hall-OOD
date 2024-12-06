@@ -2,6 +2,7 @@ import torch
 from metric_utils import get_measures, print_measures
 from tqdm import tqdm
 from sklearn.decomposition import PCA
+from sklearn.metrics import roc_auc_score, roc_curve, accuracy_score
 import numpy as np
 
 
@@ -11,22 +12,37 @@ class PCADiscriminator:
     def __init__(self, n_components, X) -> None:
         # X.shape= (num_samples,dimensions_of_hidden_states)
 
-        mean_recorded = X.mean(0)
-        centered = X-mean_recorded
-        pca_model = PCA(n_components=n_components, whiten=False).fit(centered)
-        components = pca_model.components_.T
+        pca_model = PCA(n_components=n_components, whiten=False).fit(X)
+        projections = pca_model.singular_values_*pca_model.components_.T
         mean_recorded = pca_model.mean_
 
-        self.mean_recorded = mean_recorded
-        self.centered = self.X-self.mean_recorded
-        self.components = components
+        self.X = X
+        self.projections = projections
 
     def get_score(self):
         scores = np.mean(
-            np.matmul(self.centered, self.components), -1, keepdims=True)
+            np.matmul(self.X, self.projections), -1, keepdims=True)
         assert scores.shape[1] == 1
         scores = np.sqrt(np.sum(np.square(scores), axis=1))
         return scores  # scores.shape=(num_samples)
+
+    def get_best_split(self, y):
+        '''get best split from scores'''
+        scores = self.get_score()
+        fpr, tpr, thresholds = roc_curve(y, scores)
+
+        # Calculate Youden's J statistic
+        youdens_j = tpr - fpr
+        # Find the index of the maximum J statistic
+        best_index = np.argmax(youdens_j)
+        best_threshold = thresholds[best_index]
+
+        return best_threshold
+
+    def get_acc(self, split, y):
+        scores = self.get_score()
+        preds = (scores > split)
+        return accuracy_score(y, preds)
 
 
 def svd_embed_score(embed_generated_wild, gt_label, begin_k, k_span, mean=1, svd=1, weight=0):

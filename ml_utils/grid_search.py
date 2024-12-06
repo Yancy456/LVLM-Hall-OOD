@@ -12,24 +12,27 @@ class GridSearch:
         '''
         self.X_val = X_val
         self.y_val = y_val
-        self.estimator = evaluator
+        self.evaluator = evaluator
         self.param_grid = param_grid
 
     def search(self):
-        param1 = self.param.items()[0]
-        param2 = self.param.items()[1]
+        params = list(self.param_grid.items())
+        param1 = params[0]
+        param2 = params[1]
 
         best_score = 0
         best_results = {}
 
-        print(f'Grid Searching for best {param1['key']},{param2['key']}')
+        print(f"Grid Searching for best {param1[0]},{param2[0]}")
 
-        for i in param1['value']:
-            for j in param2['value']:
-                score = self.estimator(i, j, self.X_val, self.y_val)
+        for i in param1[1]:
+            for j in param2[1]:
+                score = self.evaluator(i, j, self.X_val, self.y_val)
                 if score > best_score:
+                    print(
+                        f"found best {param1[0]}:{i},{param2[0]}:{j} Score: {score}")
                     best_score = score
-                    best_results['param1'] = i
-                    best_results['param2'] = j
+                    best_results[param1[0]] = i
+                    best_results[param2[0]] = j
         best_results['best_score'] = best_score
         return best_results
