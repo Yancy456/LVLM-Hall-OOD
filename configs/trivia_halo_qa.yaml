@@ -1,0 +1,12 @@
+model_name: LLaMa-7B
+model_path: /root/autodl-tmp/llama2-7b-chat
+judge_path: lucadiliello/BLEURT-20
+save_path: ./output/trivia_halo_qa
+dataset: trivia_qa_halo
+prompt: concisely
+theme: QA
+temperature: 0.0
+top_p: 0.9
+sampling: random
+num_beams: 1
+num_samples: 1000

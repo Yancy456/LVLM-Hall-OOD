@@ -1,0 +1,12 @@
+model_name: LLaVA-7B
+model_path: /root/autodl-tmp/liuhaotian/llava-7b 
+save_path: ./output/mad_val_save
+split: val
+dataset: MAD
+prompt: mq
+theme: mad
+num_chunks: 1
+chunk_idx: 0
+temperature: 0.0
+top_p: 0.9
+num_beams: 1

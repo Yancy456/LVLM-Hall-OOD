@@ -1,0 +1,4 @@
+*.pyc
+*.jpg
+output/*
+.mypy_cache/*

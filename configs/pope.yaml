@@ -1,0 +1,14 @@
+model_name: LLaVA-7B-new
+model_path: /root/autodl-tmp/llava-1.5-7b-hf
+save_path: ./output/pope
+split: train
+dataset: POPE
+prompt: oe
+theme: general
+num_chunks: 1
+chunk_idx: 0
+temperature: 0.0
+top_p: 0.9
+sampling: random
+num_beams: 1
+num_samples: 1000
