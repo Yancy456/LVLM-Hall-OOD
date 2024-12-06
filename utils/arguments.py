@@ -33,7 +33,7 @@ class Arguments:
                             choices=['train', 'val', 'test'])
         parser.add_argument("--prompt", type=str)
         parser.add_argument("--theme", type=str)
-        parser.add_argument("--category", type=str)
+        parser.add_argument("--category", type=str, default=None)
         parser.add_argument(
             "--save_path", required=True, type=str)
 

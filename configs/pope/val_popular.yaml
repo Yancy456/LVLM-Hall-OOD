@@ -2,11 +2,14 @@ model_name: LLaVA-7B
 model_path: /root/autodl-tmp/llava-1.5-7b-hf
 save_path: ./output/pope
 
-split: train
 dataset: POPE
-annotation_path: ./data/pope/coco_train/coco_train_pope_popular.jsonl
+annotation_path: ./data/pope/coco_val/coco_val_pope_popular.jsonl
+data_folder: 
+split: val
 prompt: oe
 theme: general
+category: popular
+
 temperature: 0.0
 top_p: 0.9
 num_beams: 1

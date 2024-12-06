@@ -1,6 +1,7 @@
 import torch
 from transformers import TextStreamer
 from typing import Literal
+import cv2
 
 
 class LLMGeneration():
@@ -24,12 +25,67 @@ class LLMGeneration():
             'output_logits': False
         }
 
-    def set_config(self, **new_config):
-        '''set new config for generation'''
-        new_cfg = self.generation_cfg.copy(
-        )  # Copy the old dictionary new_dict.update(additional_keys)
-        new_cfg.update(new_config)
-        return new_cfg
+    def generate(self, prompt, img_path=None, hidden_state_type: Literal['post-generation', 'SLT'] = 'SLT'):
+        config = {
+            'max_new_tokens': 50,
+            # 'stop_strings': ['\n'],
+            'return_dict_in_generate': True,
+            'output_hidden_states': True if hidden_state_type != 'post_generation' else False,
+            'output_scores': False,
+            'output_logits': False,
+        }
+        inputs = self.encode_prompts(prompt, img_path)
+
+        outputs = self.model.generate(
+            **inputs, **config)
+
+        if hidden_state_type != 'post-generation':
+            hidden_states = self.phrase_hidden_states(outputs.hidden_states)
+        elif hidden_state_type == 'post-generation':
+            with torch.no_grad():
+                hidden_states = self.model(
+                    outputs.sequences[:, :-1], output_hidden_states=True).hidden_states
+                hidden_states = torch.stack(hidden_states, dim=0).squeeze()
+                hidden_states = hidden_states.detach().cpu().numpy()[:, -1, :]
+        else:
+            raise ValueError('hidden_state_type error')
+
+        input_ids = inputs['input_ids']
+        most_likely_response = self.processor.decode(
+            outputs.sequences[0, input_ids.shape[1]:], skip_special_tokens=True)
+        most_likely_response = self.phrase_responses(most_likely_response)
+
+        return {
+            "most_likely": {
+                'embedding': hidden_states,
+                'response': most_likely_response
+            }
+        }
+
+    def encode_prompts(self, prompt, img_path):
+        if img_path != None:
+            # Vision Model
+            image = cv2.imread(img_path)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            conversation = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {"type": "image"}
+                    ],
+                }
+            ]
+            prompt = self.processor.apply_chat_template(
+                conversation, add_generation_prompt=True)
+
+            inputs = self.processor(images=image, text=prompt,
+                                    return_tensors='pt', padding=True).to(0, torch.float16)
+            return inputs
+        else:
+            # Language Model
+            inputs = self.processor(prompt, return_tensors="pt").to(0)
+            return inputs
 
     def phrase_hidden_states(self, hidden_states, token_position: str = 'SLT'):
         '''
@@ -57,40 +113,9 @@ class LLMGeneration():
 
         return list(map(phraser, responeses)) if isinstance(responeses, list) else phraser(responeses)
 
-    def encode_prompts(self, prompt, img_path):
-
-    def generate(self, prompt, img_path, hidden_state_type: Literal['post-generation', 'SLT']):
-        config = {
-            'max_new_tokens': 50,
-            # 'stop_strings': ['\n'],
-            'return_dict_in_generate': True,
-            'output_hidden_states': True if hidden_state_type != 'post_generation' else False,
-            'output_scores': False,
-            'output_logits': False,
-        }
-
-        outputs = self.model.generate(
-            **inputs, **config)
-
-        if hidden_state_type != 'post-generation':
-            hidden_states = self.phrase_hidden_states(outputs.hidden_states)
-        elif hidden_state_type == 'post-generation':
-            with torch.no_grad():
-                hidden_states = self.model(
-                    outputs.sequences[:, :-1], output_hidden_states=True).hidden_states
-                hidden_states = torch.stack(hidden_states, dim=0).squeeze()
-                hidden_states = hidden_states.detach().cpu().numpy()[:, -1, :]
-        else:
-            raise ValueError('hidden_state_type error')
-
-        input_ids = inputs['input_ids']
-        most_likely_response = self.processor.decode(
-            outputs.sequences[0, input_ids.shape[1]:], skip_special_tokens=True)
-        most_likely_response = self.phrase_responses(most_likely_response)
-
-        return {
-            "most_likely": {
-                'embedding': hidden_states,
-                'response': most_likely_response
-            }
-        }
+    def set_config(self, **new_config):
+        '''set new config for generation'''
+        new_cfg = self.generation_cfg.copy(
+        )  # Copy the old dictionary new_dict.update(additional_keys)
+        new_cfg.update(new_config)
+        return new_cfg
