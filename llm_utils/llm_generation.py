@@ -57,7 +57,9 @@ class LLMGeneration():
 
         return list(map(phraser, responeses)) if isinstance(responeses, list) else phraser(responeses)
 
-    def generate(self, hidden_state_type: Literal['post-generation', 'SLT'], **inputs):
+    def encode_prompts(self, prompt, img_path):
+
+    def generate(self, prompt, img_path, hidden_state_type: Literal['post-generation', 'SLT']):
         config = {
             'max_new_tokens': 50,
             # 'stop_strings': ['\n'],
@@ -92,57 +94,3 @@ class LLMGeneration():
                 'response': most_likely_response
             }
         }
-
-    def multiple_generation(self, n_entropy_samples=10, **inputs):
-        '''first generate a low-entropy answer for embedding extraction
-        and generate 'n_entropy_samples' used for calculate semantic entropy
-        '''
-
-        '''low-temperature output'''
-        # output results to std_out for debugging
-        streamer = TextStreamer(self.processor)
-
-        # outputs = self.model.generate(
-        #    **inputs, **self.generation_cfg)
-
-        outputs = self.model.generate(
-            **inputs, **self.generation_cfg, streamer=streamer, tokenizer=self.processor)
-
-        input_ids = inputs['input_ids']
-
-        most_likely_response = self.processor.decode(
-            outputs.sequences[0, input_ids.shape[1]:], skip_special_tokens=True)
-        most_likely_response = self.phrase_responses(most_likely_response)
-
-        hidden_states = self.phrase_hidden_states(outputs.hidden_states)
-
-        '''high-temperature output'''
-        new_cfg = self.set_config(temperature=1.0, output_hidden_states=False,
-                                  num_return_sequences=n_entropy_samples)
-        outputs = self.model.generate(
-            **inputs, **new_cfg, tokenizer=self.processor)
-
-        # to do: remove contral token ids before decode?
-        all_responses = self.processor.batch_decode(
-            outputs.sequences[:, input_ids.shape[1]:], skip_special_tokens=True)
-        all_responses = self.phrase_responses(all_responses)
-
-        return {
-            "most_likely": {
-                'embedding': hidden_states,
-                'response': most_likely_response
-            },
-            'responses': all_responses,
-        }
-
-        # return {
-        #    "most_likely": {
-        #        'embedding': hidden_states,
-        #        'response': most_likely_response
-        #    },
-        #    'responses': all_responses,
-        #     "output_ids": output_ids.tolist(),
-        #     "logits": logits,
-        #     "hidden_states": hidden_states
-        #               "probs": probs.tolist()[args.token_id],
-        # }

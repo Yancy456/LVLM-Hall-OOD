@@ -11,12 +11,14 @@ from model import build_model
 from dataset import build_dataset
 from utils.func import split_list, get_chunk
 from utils.prompt import Prompter
-from LLM_tools.llm_generation import LLMGeneration
+from llm_utils.llm_generation import LLMGeneration
 from utils.store_data import StoreData
 from utils.arguments import Arguments
 from ML_tools.semantic_clustering.semantic_entropy import EntailmentDeberta
 from ML_tools.semantic_clustering.semantic_clustering import SemanticClustering
-from data_process.answer_judge import AnswerJudge
+from answer_judge import AnswerJudge
+from dataset_loaders import load_data
+from dataset_loaders.utils import data_sampler
 
 
 def get_model_output(args, data, model, processor):
@@ -33,7 +35,7 @@ def get_model_output(args, data, model, processor):
     llm_generation = LLMGeneration(model, processor)
     judge = AnswerJudge(args.dataset, model_path=args.judge_path)
     for ins in tqdm(data):
-        # check if dataset has image input
+        # Vision model or Language model
         if 'img_path' in ins:
             image = cv2.imread(ins['img_path'])
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -62,9 +64,9 @@ def get_model_output(args, data, model, processor):
 
         ins.update(results)
 
-        label = judge.check_answer(ins)
-
-        ins['label'] = label
+        if args.judge_type != 'no_judge':
+            label = judge.check_answer(ins)
+            ins['label'] = label
 
         '''
         ins={
@@ -89,26 +91,10 @@ def main(args):
     prompter = Prompter(args.prompt, args.theme)
 
     data = build_dataset(args.dataset, args.split, prompter)
-    if args.num_samples is not None:
-        if args.sampling == 'first':
-            data = data[:args.num_samples]
-        elif args.sampling == "random":
-            np.random.shuffle(data)
-            data = data[:args.num_samples]
-        else:
-            labels = np.array([ins['label'] for ins in data])
-            classes = np.unique(labels)
-            data = np.array(data)
-            final_data = []
-            for cls in classes:
-                cls_data = data[labels == cls]
-                idx = np.random.choice(
-                    range(len(cls_data)), args.num_samples, replace=False)
-                final_data.append(cls_data[idx])
-            data = list(np.concatenate(final_data))
 
-    if not os.path.exists(f"./output/{args.model_name}/"):
-        os.makedirs(f"./output/{args.model_name}/")
+    if args.num_samples is not None:
+        data = data_sampler(
+            data, num_samples=args.num_samples, shuffle=args.shuffle)
 
     get_model_output(
         args, data, model, processor)

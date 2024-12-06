@@ -1,5 +1,6 @@
 import argparse
 import yaml
+from yaml_arguments.argument_base import yaml_bool
 
 cfg = None  # global sharing configurations
 
@@ -17,31 +18,40 @@ class Arguments:
         return sys_parser.parse_args()
 
     def yaml_config(self, dict):
-        '''where define the parameters in yaml configuration files'''
-        parser = argparse.ArgumentParser(
-            description='Process yaml parameters.')
+        parser = argparse.ArgumentParser()
 
-        parser.add_argument("--model_name", default="LLaVA-7B")
+        # Model name and path
+        parser.add_argument("--model_name", required=True, type=str)
         parser.add_argument(
-            "--model_path", default="/root/autodl-tmp/liuhaotian/llava-7b")
+            "--model_path", required=True, type=str)
+
+        # Dataset configurations
+        parser.add_argument("--dataset", required=True, type=str)
+        parser.add_argument("--annotation_path", required=True, type=str)
+        parser.add_argument("--data_folder", required=True, type=str)
+        parser.add_argument("--split", default="val",
+                            choices=['train', 'val', 'test'])
+        parser.add_argument("--prompt", type=str)
+        parser.add_argument("--theme", type=str)
+        parser.add_argument("--category", type=str)
         parser.add_argument(
-            "--save_path", default="./output/save_for_eval_linear")
+            "--save_path", required=True, type=str)
+
         parser.add_argument("--num_samples", type=int,
-                            default=None, help='the number of samples')
+                            help='the number of samples')
         parser.add_argument(
-            "--sampling", choices=['first', 'random', 'class'], default='random')
-        parser.add_argument("--split", default="val")
-        parser.add_argument("--dataset", default="MAD")
-        parser.add_argument("--prompt", default='mq')
-        parser.add_argument("--theme", default='mad')
-        parser.add_argument("--answers_file", type=str,
-                            default="./output/tmp/0_0.jsonl")
-        parser.add_argument("--num_chunks", type=int, default=1)
-        parser.add_argument("--chunk_idx", type=int, default=0)
+            "--shuffle", type=yaml_bool, default=False, help='whether shuffle data')
+
+        # Answer judge configurations
+        parser.add_argument(
+            "--judge_type", choices=['no_judge', 'belurt'], default='no_judge')
+        parser.add_argument("--judge_path", type=str)
+
+        # LLM generation configurations
         parser.add_argument("--temperature", type=float, default=0.0)
         parser.add_argument("--top_p", type=float, default=0.9)
         parser.add_argument("--num_beams", type=int, default=1)
-        parser.add_argument("--judge_path", type=str)
+
         parser.add_argument("--token_id", type=int, default=0,
                             help='the index of token that is used to classification. 0 means the first token.')
 
