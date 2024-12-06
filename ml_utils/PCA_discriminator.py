@@ -1,34 +1,32 @@
+import torch
+from metric_utils import get_measures, print_measures
+from tqdm import tqdm
 from sklearn.decomposition import PCA
 import numpy as np
+
 
 class PCADiscriminator:
     '''A class that uses PCA to score data'''
-    def __init__(self,k,X) -> None:
+
+    def __init__(self, n_components, X) -> None:
         # X.shape= (num_samples,dimensions_of_hidden_states)
 
-        mean_recorded=X.mean(0)
-        centered=X-mean_recorded
-        pca_model = PCA(n_components=k, whiten=False).fit(centered)
+        mean_recorded = X.mean(0)
+        centered = X-mean_recorded
+        pca_model = PCA(n_components=n_components, whiten=False).fit(centered)
         components = pca_model.components_.T
         mean_recorded = pca_model.mean_
 
-        self.mean_recorded=mean_recorded
-        self.centered=self.X-self.mean_recorded
-        self.components=components
+        self.mean_recorded = mean_recorded
+        self.centered = self.X-self.mean_recorded
+        self.components = components
 
     def get_score(self):
         scores = np.mean(
-                np.matmul(self.centered, self.components), -1, keepdims=True)
+            np.matmul(self.centered, self.components), -1, keepdims=True)
         assert scores.shape[1] == 1
         scores = np.sqrt(np.sum(np.square(scores), axis=1))
-        return scores # scores.shape=(num_samples)
-    
-
-from tqdm import tqdm
-import numpy as np
-from metric_utils import get_measures, print_measures
-import torch
-from sklearn.decomposition import PCA
+        return scores  # scores.shape=(num_samples)
 
 
 def svd_embed_score(embed_generated_wild, gt_label, begin_k, k_span, mean=1, svd=1, weight=0):
