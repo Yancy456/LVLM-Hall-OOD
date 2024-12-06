@@ -25,12 +25,12 @@ class LLMGeneration():
             'output_logits': False
         }
 
-    def generate(self, prompt, img_path=None, hidden_state_type: Literal['post-generation', 'SLT'] = 'SLT'):
+    def generate(self, prompt, img_path=None, hidden_state_type: Literal['SLT'] = 'SLT'):
         config = {
             'max_new_tokens': 50,
             # 'stop_strings': ['\n'],
             'return_dict_in_generate': True,
-            'output_hidden_states': True if hidden_state_type != 'post_generation' else False,
+            'output_hidden_states': True,
             'output_scores': False,
             'output_logits': False,
         }
@@ -39,16 +39,7 @@ class LLMGeneration():
         outputs = self.model.generate(
             **inputs, **config)
 
-        if hidden_state_type != 'post-generation':
-            hidden_states = self.phrase_hidden_states(outputs.hidden_states)
-        elif hidden_state_type == 'post-generation':
-            with torch.no_grad():
-                hidden_states = self.model(
-                    outputs.sequences[:, :-1], output_hidden_states=True).hidden_states
-                hidden_states = torch.stack(hidden_states, dim=0).squeeze()
-                hidden_states = hidden_states.detach().cpu().numpy()[:, -1, :]
-        else:
-            raise ValueError('hidden_state_type error')
+        hidden_states = self.phrase_hidden_states(outputs.hidden_states)
 
         input_ids = inputs['input_ids']
         most_likely_response = self.processor.decode(

@@ -14,6 +14,9 @@ def load_data(dataset_name: str, prompter: Prompter, annotation_path: str, data_
     split: choose from train, val or test set
     category: some dataset contains different category
     '''
+
     if dataset_name == 'POPE':
-        dataset_loader = POPEDataset(prompter, annotation_path,
+        dataset_loader = POPEDataset(annotation_path,
                                      data_folder, split, category)
+        return dataset_loader.get_data()
+    return []

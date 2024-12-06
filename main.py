@@ -56,6 +56,7 @@ def main(args):
 
 
 if __name__ == "__main__":
-    arguments = Arguments(default_config='./configs/trivia_halo_qa.yaml')
+    arguments = Arguments(
+        default_config='/home/hallscope/configs/pope/val_popular.yaml')
     args = arguments.get_config()
     main(args)

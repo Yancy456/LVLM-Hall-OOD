@@ -3,8 +3,8 @@ model_path: /root/autodl-tmp/llava-1.5-7b-hf
 save_path: ./output/pope
 
 dataset: POPE
-annotation_path: ./data/pope/coco_val/coco_val_pope_popular.jsonl
-data_folder: 
+annotation_path: /home/hallscope/data/pope/coco_val/coco_val_pope_popular.json
+data_folder: /root/autodl-fs/coco_images/val
 split: val
 prompt: oe
 theme: general

@@ -4,21 +4,22 @@ import numpy as np
 
 from dataset.base import BaseDataset
 from utils.func import read_jsonl
-from typing import Literal,Optional
+from typing import Literal, Optional
 from utils.prompt import Prompter
 
+
 class POPEDataset():
-    def __init__(self, annotation_path:str,data_folder:str,
-              split:Literal['train','val','test'],category:Literal["adversarial", "popular", "random"]):
-        
+    def __init__(self, annotation_path: str, data_folder: str,
+                 split: Literal['train', 'val', 'test'], category: Literal["adversarial", "popular", "random"]):
+
         self.ann_path = annotation_path
         self.img_root = data_folder
         self.split = split
-        self.category=category
-        if category not in ["adversarial", "popular", "random"]: # check category value
+        self.category = category
+        if category not in ["adversarial", "popular", "random"]:  # check category value
             raise ValueError(f'No such {category} in POPE dataset!')
 
-    def get_data(self):
+    def get_data(self) -> list:
         data = []
         ann = read_jsonl(self.ann_path)
         data_cat = [
