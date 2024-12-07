@@ -1,0 +1,16 @@
+model_name: LLaVA-7B
+model_path: /root/autodl-tmp/llava-1.5-7b-hf
+save_path: ./output/pope_train
+
+dataset: POPE
+annotation_path: /home/hallscope/data/pope/coco_train/coco_train_pope_popular.jsonl
+data_folder: /root/autodl-fs/coco_images/train
+split: train
+prompt: oe
+theme: general
+category: popular
+num_samples: 20000
+
+temperature: 0.0
+top_p: 0.9
+num_beams: 1

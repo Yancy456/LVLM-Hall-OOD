@@ -34,7 +34,7 @@ def main(args):
 
         ins.update(results)
 
-        if args.judge_type != 'no_judge':  # check answer
+        if args.judge_type != 'no_judge':  # check answers
             label = judge.check_answer(ins)
             ins['label'] = label
 
@@ -57,6 +57,6 @@ def main(args):
 
 if __name__ == "__main__":
     arguments = Arguments(
-        default_config='/home/hallscope/configs/pope/val_popular.yaml')
+        default_config='/home/hallscope/configs/pope/train_popular.yaml')
     args = arguments.get_config()
     main(args)
