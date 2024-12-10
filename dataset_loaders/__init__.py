@@ -2,10 +2,11 @@ from typing import Literal, Optional
 from .POPE import POPEDataset
 from utils.prompt import Prompter
 import argparse
+from torch.utils.data import DataLoader
 
 
 def load_data(dataset_name: str, prompter: Prompter, annotation_path: str, data_folder: str,
-              split: Literal['train', 'val', 'test'], category: Optional[str] = None) -> list:
+              split: Literal['train', 'val', 'test'], batch_size: int = 1, category: Optional[str] = None) -> DataLoader:
     '''
     Load data from dataset 'dataset_name'.
     propter: Prompter used to construct prompts
@@ -16,7 +17,7 @@ def load_data(dataset_name: str, prompter: Prompter, annotation_path: str, data_
     '''
 
     if dataset_name == 'POPE':
-        dataset_loader = POPEDataset(annotation_path,
-                                     data_folder, split, category)
-        return dataset_loader.get_data()
-    return []
+        data = POPEDataset(annotation_path,
+                           data_folder, split, category).get_data()
+
+    return data

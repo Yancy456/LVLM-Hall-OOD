@@ -2,6 +2,7 @@ import torch
 from transformers import TextStreamer
 from typing import Literal
 import cv2
+from datasets import Dataset
 
 
 class LLMGeneration():
@@ -25,7 +26,7 @@ class LLMGeneration():
             'output_logits': False
         }
 
-    def generate(self, prompt, img_path=None, hidden_state_type: Literal['SLT'] = 'SLT'):
+    def generate(self, batch: Dataset, hidden_state_type: Literal['SLT'] = 'SLT'):
         config = {
             'max_new_tokens': 50,
             # 'stop_strings': ['\n'],
@@ -34,7 +35,7 @@ class LLMGeneration():
             'output_scores': False,
             'output_logits': False,
         }
-        inputs = self.encode_prompts(prompt, img_path)
+        inputs = self.encode_prompts(batch)
 
         outputs = self.model.generate(
             **inputs, **config)
@@ -53,7 +54,7 @@ class LLMGeneration():
             }
         }
 
-    def encode_prompts(self, prompt, img_path):
+    def encode_prompts(self, batch: Dataset):
         if img_path != None:
             # Vision Model
             image = cv2.imread(img_path)

@@ -36,7 +36,8 @@ class Arguments:
         parser.add_argument("--category", type=str, default=None)
         parser.add_argument(
             "--save_path", required=True, type=str)
-
+        parser.add_argument(
+            "--batch_size", default=1, type=int)
         parser.add_argument("--num_samples", type=int,
                             help='the number of samples')
         parser.add_argument(

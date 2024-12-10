@@ -6,6 +6,8 @@ from dataset.base import BaseDataset
 from utils.func import read_jsonl
 from typing import Literal, Optional
 from utils.prompt import Prompter
+import pandas as pd
+from datasets import Dataset
 
 
 class POPEDataset():
@@ -19,7 +21,7 @@ class POPEDataset():
         if category not in ["adversarial", "popular", "random"]:  # check category value
             raise ValueError(f'No such {category} in POPE dataset!')
 
-    def get_data(self) -> list:
+    def get_data(self) -> Dataset:
         data = []
         ann = read_jsonl(self.ann_path)
         data_cat = [
@@ -34,5 +36,5 @@ class POPEDataset():
         ]
 
         data += data_cat
-
-        return data
+        df = pd.DataFrame(data)
+        return Dataset.from_pandas(df)

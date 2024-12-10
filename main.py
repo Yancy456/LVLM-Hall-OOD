@@ -9,16 +9,18 @@ from answer_judge import AnswerJudge
 from dataset_loaders import load_data
 from dataset_loaders.utils import data_sampler
 import os
+from torch.utils.data import DataLoader
 
 
 def main(args):
     # Load dataset
     prompter = Prompter(args.prompt, args.theme)
     data = load_data(args.dataset, prompter,
-                     args.annotation_path, args.data_folder, args.split, args.category)
+                     args.annotation_path, args.data_folder, args.split, args.batch_size, args.category)
     if args.num_samples is not None:
         data = data_sampler(
             data, num_samples=args.num_samples, shuffle=args.shuffle)
+    data_loader = DataLoader(data, batch_size=args.batch_size, shuffle=False)
 
     # Load LLM and answer judge
     model, processor = load_llm(args.model_name, args.model_path)
@@ -27,18 +29,19 @@ def main(args):
     store_data = StoreData(args.save_path)
 
     # Generate responses and embeddings
-    for ins in tqdm(data):
-        img_path = ins['img_path'] if 'img_path' in ins else None
+    for batch in tqdm(data_loader):
+        img_path = batch['img_path'] if 'img_path' in batch else None
+
         if not os.path.isfile(img_path):  # file no existing
             continue
         results = llm_generation.generate(
-            prompt=ins['question'], img_path=img_path, hidden_state_type='post-generation')
+            prompt=batch['question'], img_path=img_path, hidden_state_type='post-generation')
 
-        ins.update(results)
+        batch.update(results)
 
         if args.judge_type != 'no_judge':  # check answers
-            label = judge.check_answer(ins)
-            ins['label'] = label
+            label = judge.check_answer(batch)
+            batch['label'] = label
 
         '''
         ins={
@@ -54,10 +57,10 @@ def main(args):
         '...': other dataset specific keys
         }
         '''
-        store_data.store(ins)
+        store_data.store(batch)
 
 
 if __name__ == "__main__":
-    arguments = Arguments()
+    arguments = Arguments('./configs/pope/train_popular.yaml')
     args = arguments.get_config()
     main(args)
