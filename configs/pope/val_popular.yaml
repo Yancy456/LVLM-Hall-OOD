@@ -1,9 +1,9 @@
 model_name: LLaVA-7B
 model_path: /root/autodl-tmp/llava-1.5-7b-hf
-save_path: ./output/pope
+save_path: /root/autodl-fs/hallscope/pope/popular/val
 
 dataset: POPE
-annotation_path: /home/hallscope/data/pope/coco_val/coco_val_pope_popular.json
+annotation_path: /home/hallscope/data/pope/coco_val/coco_val_pope_popular.jsonl
 data_folder: /root/autodl-fs/coco_images/val
 split: val
 prompt: oe

@@ -3,7 +3,7 @@ import torch
 from llm_utils.llm_loader import load_llm
 from utils.prompt import Prompter
 from llm_utils.llm_generation import LLMGeneration
-from utils.store_data import StoreData
+from utils.store_data import StoreData, ReadData
 from utils.arguments import Arguments
 from answer_judge import AnswerJudge
 from dataset_loaders import load_data
@@ -14,27 +14,16 @@ import os
 def main(args):
     # Load dataset
     prompter = Prompter(args.prompt, args.theme)
-    data = load_data(args.dataset, prompter,
-                     args.annotation_path, args.data_folder, args.split, args.category)
-    if args.num_samples is not None:
-        data = data_sampler(
-            data, num_samples=args.num_samples, shuffle=args.shuffle)
 
     # Load LLM and answer judge
     model, processor = load_llm(args.model_name, args.model_path)
     llm_generation = LLMGeneration(model, processor)
     judge = AnswerJudge(args.dataset, model_path=args.judge_path)
     store_data = StoreData(args.save_path)
+    data = ReadData(args.save_path).read_all()
 
     # Generate responses and embeddings
     for ins in tqdm(data):
-        img_path = ins['img_path'] if 'img_path' in ins else None
-        if not os.path.isfile(img_path):  # file no existing
-            continue
-        results = llm_generation.generate(
-            prompt=ins['question'], img_path=img_path, hidden_state_type='post-generation')
-
-        ins.update(results)
 
         if args.judge_type != 'no_judge':  # check answers
             label = judge.check_answer(ins)
