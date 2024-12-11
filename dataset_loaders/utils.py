@@ -8,4 +8,4 @@ def data_sampler(dataset: Dataset, num_samples: int, shuffle: bool = False):
     '''
     if shuffle:
         dataset.shuffle()
-    return dataset.select([0, num_samples])
+    return dataset.select(range(num_samples))

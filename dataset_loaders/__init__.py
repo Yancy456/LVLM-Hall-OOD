@@ -3,6 +3,7 @@ from .POPE import POPEDataset
 from utils.prompt import Prompter
 import argparse
 from torch.utils.data import DataLoader
+import os
 
 
 def load_data(dataset_name: str, prompter: Prompter, annotation_path: str, data_folder: str,
@@ -20,4 +21,9 @@ def load_data(dataset_name: str, prompter: Prompter, annotation_path: str, data_
         data = POPEDataset(annotation_path,
                            data_folder, split, category).get_data()
 
-    return data
+    indices_to_keep = []
+    for i in range(len(data)):  # check image existance
+        if os.path.isfile(data[i]['img_path']):
+            indices_to_keep.append(i)
+
+    return data.select(indices_to_keep)

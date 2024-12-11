@@ -1,8 +1,9 @@
 import torch
 from transformers import TextStreamer
-from typing import Literal
+from typing import Literal, List, Dict
 import cv2
 from datasets import Dataset
+from PIL import Image
 
 
 class LLMGeneration():
@@ -35,17 +36,17 @@ class LLMGeneration():
             'output_scores': False,
             'output_logits': False,
         }
-        inputs = self.encode_prompts(batch)
+        inputs, prompts = self.encode_prompts(batch)
 
         outputs = self.model.generate(
             **inputs, **config)
 
         hidden_states = self.phrase_hidden_states(outputs.hidden_states)
 
-        input_ids = inputs['input_ids']
-        most_likely_response = self.processor.decode(
-            outputs.sequences[0, input_ids.shape[1]:], skip_special_tokens=True)
-        most_likely_response = self.phrase_responses(most_likely_response)
+        most_likely_response = self.processor.batch_decode(
+            outputs.sequences, skip_special_tokens=True)
+        most_likely_response = self.phrase_responses(
+            most_likely_response, prompts)
 
         return {
             "most_likely": {
@@ -55,55 +56,66 @@ class LLMGeneration():
         }
 
     def encode_prompts(self, batch: Dataset):
-        if img_path != None:
+        if 'img_path' in batch:
             # Vision Model
-            image = cv2.imread(img_path)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            conversation = [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {"type": "image"}
-                    ],
-                }
-            ]
-            prompt = self.processor.apply_chat_template(
-                conversation, add_generation_prompt=True)
+            img_paths = batch['img_path']
+            images = [Image.open(path) for path in img_paths]
 
-            inputs = self.processor(images=image, text=prompt,
+            def apply_to_template(prompt):
+                conversation = [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": prompt},
+                            {"type": "image"}
+                        ],
+                    }]
+                return self.processor.apply_chat_template(
+                    conversation, add_generation_prompt=True)
+
+            prompts = [apply_to_template(x) for x in batch['question']]
+
+            inputs = self.processor(images=images, text=prompts,
                                     return_tensors='pt', padding=True).to(0, torch.float16)
-            return inputs
+            return inputs, prompts
         else:
             # Language Model
-            inputs = self.processor(prompt, return_tensors="pt").to(0)
-            return inputs
+            prompts = batch['question']
+            inputs = self.processor(prompts, return_tensors="pt").to(0)
+            return inputs, prompts
 
     def phrase_hidden_states(self, hidden_states, token_position: str = 'SLT'):
         '''
         outputs.hidden_states : Tuple1(Tuple2(hidden_state_tensor,...),...), the Tuple1 contains hidden_states of each generation. The Tuple2 contains hidden_states of each layer.
-        hidden_state_tensor.shape=(1,query_len=700,hidden_size=4096)
-
-        outputs.scores : Tuple(score_tensor,...), a Tuple contains score tensors of all output tokens. 
-        score_tensor.shape=(1,vacabulary_size)
+        hidden_state_tensor.shape=(batch,query_len=700,hidden_size=4096)
         '''
         if token_position == 'SLT':
-            # only using last generation results
+            # only using second last generation results
             hidden_states = hidden_states[-2]
-            hidden_states = torch.stack(hidden_states, dim=0).squeeze(
-                dim=1)  # stack all layers into one dimension
+            # stack all layers into one dimension
+            hidden_states = torch.stack(hidden_states, dim=0)
 
-            # shape=(layers,1,n_hidden)
-            hidden_states = hidden_states[:, -1:,
-                                          :].detach().cpu().float().numpy()
+            # shape=(layers,batch_size,query_len,n_hidden)
+            hidden_states = hidden_states[:, :, -1,
+                                          :].detach().cpu().transpose(0, 1).float().numpy()
+
+            # shape=(batch_size,layers,n_hidden)
         return hidden_states
 
-    def phrase_responses(self, responeses):
-        '''remove reluctant words'''
-        def phraser(x):
-            return x.replace("<pad>", "").replace("</s>", "").replace("<unk>", "").strip().lower()
+    def phrase_responses(self, responeses: List[str], prompts: List[str]) -> List[str]:
+        '''remove reluctant words and only keep respones without prompts'''
+        def phraser(i, x):
+            prompt = prompts[i].replace('<image>', ' ')
+            x = x[len(prompt):]
+            x = x.replace("<pad>", "").replace(
+                "</s>", "").replace("<unk>", "").strip()
+            return x
 
-        return list(map(phraser, responeses)) if isinstance(responeses, list) else phraser(responeses)
+        rsps = []
+        for i, x in enumerate(responeses):
+            x = phraser(i, x)
+            rsps.append(x)
+        return rsps
 
     def set_config(self, **new_config):
         '''set new config for generation'''

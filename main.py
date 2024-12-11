@@ -9,6 +9,7 @@ from answer_judge import AnswerJudge
 from dataset_loaders import load_data
 from dataset_loaders.utils import data_sampler
 import os
+from datasets import Dataset
 from torch.utils.data import DataLoader
 
 
@@ -16,11 +17,12 @@ def main(args):
     # Load dataset
     prompter = Prompter(args.prompt, args.theme)
     data = load_data(args.dataset, prompter,
-                     args.annotation_path, args.data_folder, args.split, args.batch_size, args.category)
+                     args.annotation_path, args.data_folder, args.split, args.batch_size, args.category)  # type: Dataset
     if args.num_samples is not None:
         data = data_sampler(
             data, num_samples=args.num_samples, shuffle=args.shuffle)
-    data_loader = DataLoader(data, batch_size=args.batch_size, shuffle=False)
+    data_loader = DataLoader(
+        data, batch_size=args.batch_size, shuffle=False, pin_memory=True)
 
     # Load LLM and answer judge
     model, processor = load_llm(args.model_name, args.model_path)
@@ -30,18 +32,14 @@ def main(args):
 
     # Generate responses and embeddings
     for batch in tqdm(data_loader):
-        img_path = batch['img_path'] if 'img_path' in batch else None
-
-        if not os.path.isfile(img_path):  # file no existing
-            continue
-        results = llm_generation.generate(
-            prompt=batch['question'], img_path=img_path, hidden_state_type='post-generation')
+        results = llm_generation.generate(batch)
 
         batch.update(results)
+        batch['label'] = batch['label'].numpy()
 
-        if args.judge_type != 'no_judge':  # check answers
-            label = judge.check_answer(batch)
-            batch['label'] = label
+        # if args.judge_type != 'no_judge':  # check answers
+        #    label = judge.check_answer(batch)
+        #    batch['label'] = label
 
         '''
         ins={

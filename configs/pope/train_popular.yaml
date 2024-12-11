@@ -10,6 +10,7 @@ prompt: oe
 theme: general
 category: popular
 num_samples: 20000
+batch_size: 16
 
 temperature: 0.0
 top_p: 0.9
