@@ -4,13 +4,16 @@ from utils.prompt import Prompter
 import argparse
 from torch.utils.data import DataLoader
 import os
+from torch.utils.data import Dataset, DataLoader
+from datasets import Dataset as HfDataset
+from PIL import Image
 
 
 def load_data(dataset_name: str, prompter: Prompter, annotation_path: str, data_folder: str,
               split: Literal['train', 'val', 'test'], batch_size: int = 1, category: Optional[str] = None) -> DataLoader:
     '''
     Load data from dataset 'dataset_name'.
-    propter: Prompter used to construct prompts
+    prompter: Prompter used to construct prompts
     annotation_path: the path of annotation file
     data_folder:  the path of data folder
     split: choose from train, val or test set
@@ -27,3 +30,22 @@ def load_data(dataset_name: str, prompter: Prompter, annotation_path: str, data_
             indices_to_keep.append(i)
 
     return data.select(indices_to_keep)
+
+
+# Define the custom dataset class
+class ImageDataset(Dataset):
+    def __init__(self, dataset: HfDataset):
+        self.dataset = dataset
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        item['img_path'] = Image.open(item['img_path'])
+
+        return item
+
+
+def collect_fun(batch):
+    pass

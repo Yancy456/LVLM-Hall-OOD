@@ -2,3 +2,4 @@
 *.jpg
 output/*
 .mypy_cache/*
+nohup.out

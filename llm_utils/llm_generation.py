@@ -102,8 +102,8 @@ class LLMGeneration():
             # shape=(batch_size,layers,n_hidden)
         return hidden_states
 
-    def phrase_responses(self, responeses: List[str], prompts: List[str]) -> List[str]:
-        '''remove reluctant words and only keep respones without prompts'''
+    def phrase_responses(self, responses: List[str], prompts: List[str]) -> List[str]:
+        '''remove reluctant words and only keep response without prompts'''
         def phraser(i, x):
             prompt = prompts[i].replace('<image>', ' ')
             x = x[len(prompt):]
@@ -112,7 +112,7 @@ class LLMGeneration():
             return x
 
         rsps = []
-        for i, x in enumerate(responeses):
+        for i, x in enumerate(responses):
             x = phraser(i, x)
             rsps.append(x)
         return rsps

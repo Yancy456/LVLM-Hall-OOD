@@ -6,7 +6,7 @@ from llm_utils.llm_generation import LLMGeneration
 from utils.store_data import StoreData
 from utils.arguments import Arguments
 from answer_judge import AnswerJudge
-from dataset_loaders import load_data
+from dataset_loaders import load_data, ImageDataset
 from dataset_loaders.utils import data_sampler
 import os
 from datasets import Dataset
