@@ -1,13 +1,19 @@
-model_name: LLaVA-7B-new
+# Model
+model_name: LLaVA-7B
 model_path: /root/autodl-tmp/llava-1.5-7b-hf
-save_path: ./output/jailbreak
-split: SD_TYPO
+save_path: /root/autodl-fs/hallscope/jailbreak
+
+# Dataset
 dataset: MMSafety
-prompt: oe
+split: SD_TYPO
+data_folder: /home/hallscope/data/MM-SafetyBench
+
+# Prompts
+prompt: mq
 theme: safety
-num_chunks: 1
-chunk_idx: 0
+
+# Generation
+batch_size: 8
 temperature: 0.0
 top_p: 0.9
 num_beams: 1
-num_samples: 1000

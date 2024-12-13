@@ -36,5 +36,4 @@ class POPEDataset():
         ]
 
         data += data_cat
-        df = pd.DataFrame(data)
-        return Dataset.from_pandas(df)
+        return data

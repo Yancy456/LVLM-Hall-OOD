@@ -27,10 +27,11 @@ class Arguments:
 
         # Dataset configurations
         parser.add_argument("--dataset", required=True, type=str)
-        parser.add_argument("--annotation_path", required=True, type=str)
         parser.add_argument("--data_folder", required=True, type=str)
-        parser.add_argument("--split", default="val",
-                            choices=['train', 'val', 'test'])
+        parser.add_argument("--annotation_path",
+                            required=False, default=None, type=str)
+
+        parser.add_argument("--split", default="val", type=str)
         parser.add_argument("--prompt", type=str)
         parser.add_argument("--theme", type=str)
         parser.add_argument("--category", type=str, default=None)

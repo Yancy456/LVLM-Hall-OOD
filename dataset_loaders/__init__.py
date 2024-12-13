@@ -1,5 +1,6 @@
 from typing import Literal, Optional
 from .POPE import POPEDataset
+from .MMSafety import MMSafetyBench
 from utils.prompt import Prompter
 import argparse
 from torch.utils.data import DataLoader
@@ -7,10 +8,11 @@ import os
 from torch.utils.data import Dataset, DataLoader
 from datasets import Dataset as HfDataset
 from PIL import Image
+import pandas as pd
 
 
-def load_data(dataset_name: str, prompter: Prompter, annotation_path: str, data_folder: str,
-              split: Literal['train', 'val', 'test'], batch_size: int = 1, category: Optional[str] = None) -> DataLoader:
+def load_data(dataset_name: str, prompter: Prompter,  data_folder: str,
+              split: Literal['train', 'val', 'test'],  annotation_path: Optional[str] = None, category: Optional[str] = None) -> DataLoader:
     '''
     Load data from dataset 'dataset_name'.
     prompter: Prompter used to construct prompts
@@ -23,7 +25,11 @@ def load_data(dataset_name: str, prompter: Prompter, annotation_path: str, data_
     if dataset_name == 'POPE':
         data = POPEDataset(annotation_path,
                            data_folder, split, category).get_data()
+    elif dataset_name == 'MMSafety':
+        data = MMSafetyBench(prompter, data_folder, split).get_data()
 
+    df = pd.DataFrame(data)
+    data = HfDataset.from_pandas(df)
     indices_to_keep = []
     for i in range(len(data)):  # check image existance
         if os.path.isfile(data[i]['img_path']):

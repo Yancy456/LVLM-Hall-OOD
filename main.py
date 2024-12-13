@@ -5,7 +5,6 @@ from utils.prompt import Prompter
 from llm_utils.llm_generation import LLMGeneration
 from utils.store_data import StoreData
 from utils.arguments import Arguments
-from answer_judge import AnswerJudge
 from dataset_loaders import load_data, ImageDataset
 from dataset_loaders.utils import data_sampler
 import os
@@ -16,8 +15,8 @@ from torch.utils.data import DataLoader
 def main(args):
     # Load dataset
     prompter = Prompter(args.prompt, args.theme)
-    data = load_data(args.dataset, prompter,
-                     args.annotation_path, args.data_folder, args.split, args.batch_size, args.category)  # type: Dataset
+    data = load_data(args.dataset, prompter, args.data_folder, args.split,
+                     args.annotation_path, args.category)  # type: Dataset
     if args.num_samples is not None:
         data = data_sampler(
             data, num_samples=args.num_samples, shuffle=args.shuffle)
@@ -27,7 +26,6 @@ def main(args):
     # Load LLM and answer judge
     model, processor = load_llm(args.model_name, args.model_path)
     llm_generation = LLMGeneration(model, processor)
-    judge = AnswerJudge(args.dataset, model_path=args.judge_path)
     store_data = StoreData(args.save_path)
 
     # Generate responses and embeddings
@@ -35,7 +33,6 @@ def main(args):
         results = llm_generation.generate(batch)
 
         batch.update(results)
-        batch['label'] = batch['label'].numpy()
 
         # if args.judge_type != 'no_judge':  # check answers
         #    label = judge.check_answer(batch)
@@ -59,6 +56,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-    arguments = Arguments('./configs/pope/train_popular.yaml')
+    arguments = Arguments('/home/hallscope/configs/jailbreak.yaml')
     args = arguments.get_config()
     main(args)

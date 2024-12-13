@@ -50,6 +50,8 @@ class Prompter:
             self.question_template = UNC_TEMP[prompt_type]
         elif theme == "QA":
             self.question_template = QA_TEMP[prompt_type]
+        else:
+            raise ValueError(f'theme {theme} no support')
 
     def build_prompt(self, que):
         return self.question_template % que
