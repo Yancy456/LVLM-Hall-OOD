@@ -1,14 +1,14 @@
 model_name: LLaVA-7B
 model_path: /root/autodl-tmp/llava-1.5-7b-hf
-save_path: /root/autodl-fs/hallscope/pope/adversarial/val
+save_path: /root/autodl-fs/hallscope/pope/random/val
 
 dataset: POPE
-annotation_path: /home/hallscope/data/pope/coco_val/coco_val_pope_adversarial.jsonl
+annotation_path: /home/hallscope/data/pope/coco_val/coco_val_pope_random.jsonl
 data_folder: /root/autodl-fs/coco_images/val
 split: val
 prompt: oe
 theme: general
-category: adversarial
+category: random
 batch_size: 8
 
 temperature: 0.0

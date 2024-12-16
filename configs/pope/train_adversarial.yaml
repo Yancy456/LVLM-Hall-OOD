@@ -1,6 +1,6 @@
 model_name: LLaVA-7B
 model_path: /root/autodl-tmp/llava-1.5-7b-hf
-save_path: /root/autodl-fs/hallscope/jailbreak
+save_path: /root/autodl-fs/hallscope/pope/adversarial/val
 
 dataset: POPE
 annotation_path: /home/hallscope/data/pope/coco_train/coco_train_pope_adversarial.jsonl
@@ -10,7 +10,7 @@ prompt: oe
 theme: general
 category: adversarial
 num_samples: 20000
-batch_size: 8
+batch_size: 2
 
 temperature: 0.0
 top_p: 0.9

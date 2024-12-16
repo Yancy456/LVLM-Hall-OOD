@@ -9,7 +9,7 @@ split: val
 prompt: oe
 theme: general
 category: popular
-batch_size: 4
+batch_size: 2
 
 temperature: 0.0
 top_p: 0.9

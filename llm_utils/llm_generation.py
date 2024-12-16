@@ -30,6 +30,7 @@ class LLMGeneration():
     def generate(self, batch: Dataset, hidden_state_type: Literal['SLT'] = 'SLT'):
         config = {
             'max_new_tokens': 50,
+            'do_sample': False,
             # 'stop_strings': ['\n'],
             'return_dict_in_generate': True,
             'output_hidden_states': True,
