@@ -1,0 +1,9 @@
+model_name: LLaVA-7B
+model_path: /root/autodl-tmp/llava-1.5-7b-hf
+save_path: /root/autodl-fs/hallscope/ScienceQA/test
+
+dataset: ScienceQA
+split: test
+prompt: oe
+theme: general
+batch_size: 2

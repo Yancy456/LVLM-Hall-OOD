@@ -10,10 +10,11 @@ from torch.utils.data import Dataset, DataLoader
 from datasets import Dataset as HfDataset
 from PIL import Image
 import pandas as pd
+from torchvision import transforms
 
 
 def load_data(dataset_name: str, prompter: Prompter,  data_folder: str,
-              split: Literal['train', 'val', 'test'],  annotation_path: Optional[str] = None, category: Optional[str] = None) -> DataLoader:
+              split: Literal['train', 'val', 'test'],  annotation_path: Optional[str] = None, category: Optional[str] = None):
     '''
     Load data from dataset 'dataset_name'.
     prompter: Prompter used to construct prompts
@@ -33,27 +34,38 @@ def load_data(dataset_name: str, prompter: Prompter,  data_folder: str,
     else:
         raise ValueError(f'No such dataset {dataset_name}')
 
-    df = pd.DataFrame(data)
-    data = HfDataset.from_pandas(df)
-    indices_to_keep = []
-    for i in range(len(data)):  # check image existence
-        if (not isinstance(data[i]['img_path'], str)) or os.path.isfile(data[i]['img_path']):
-            indices_to_keep.append(i)
-
-    return data.select(indices_to_keep)
+    # indices_to_keep = []
+    # for i in range(len(data)):  # check image existence
+    #    if (not isinstance(data[i]['img_path'], str)) or os.path.isfile(data[i]['img_path']):
+    #        indices_to_keep.append(i)
+    return data
+    # return data.select(indices_to_keep)
 
 
 # Define the custom dataset class
 class ImageDataset(Dataset):
     def __init__(self, dataset: HfDataset):
         self.dataset = dataset
+        self.img_size = (400, 400)
+        self.transform = transforms.Compose([
+            transforms.Resize(self.img_size),
+            transforms.ToTensor()  # Convert PIL image to PyTorch tensor
+        ])
 
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, idx):
         item = self.dataset[idx]
-        item['img_path'] = Image.open(item['img_path']) if isinstance(
-            item['img_path'], str) else item['img_path']
+        if 'img_path' in item:
+            image = Image.open(item['img_path'])
+        else:
+            image = item['img']
+
+        if item['img'] == None:
+            # create black image if no image input
+            image = Image.new("RGB", self.img_size, color=(255, 255, 255))
+
+        item['img'] = self.transform(image)
 
         return item

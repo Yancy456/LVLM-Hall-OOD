@@ -20,8 +20,9 @@ def main(args):
     if args.num_samples is not None:
         data = data_sampler(
             data, num_samples=args.num_samples, shuffle=args.shuffle)
+    image_dataset = ImageDataset(data)
     data_loader = DataLoader(
-        data, batch_size=args.batch_size, shuffle=False, pin_memory=True)
+        image_dataset, batch_size=args.batch_size, shuffle=False, pin_memory=True)
 
     # Load LLM and answer judge
     model, processor = load_llm(args.model_name, args.model_path)
@@ -30,17 +31,14 @@ def main(args):
 
     # Generate responses and embeddings
     for batch in tqdm(data_loader):
-        results = llm_generation.generate(batch)
+        results = llm_generation.generate(batch['question'], batch['img'])
 
         batch.update(results)
-
-        # if args.judge_type != 'no_judge':  # check answers
-        #    label = judge.check_answer(batch)
-        #    batch['label'] = label
-
+        del batch['img']
         '''
         ins={
         'img_path':the path of input image
+        'img':the image tensor
         'question': the question
         'answers':[a list of example answers]
         'most_likely':{
@@ -56,6 +54,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-    arguments = Arguments('/home/hallscope/configs/jailbreak.yaml')
+    arguments = Arguments('./configs/ScienceQA/train.yaml')
     args = arguments.get_config()
     main(args)

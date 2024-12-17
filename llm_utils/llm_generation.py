@@ -4,6 +4,7 @@ from typing import Literal, List, Dict
 import cv2
 from datasets import Dataset
 from PIL import Image
+from torch import Tensor
 
 
 class LLMGeneration():
@@ -27,7 +28,7 @@ class LLMGeneration():
             'output_logits': False
         }
 
-    def generate(self, batch: Dataset, hidden_state_type: Literal['SLT'] = 'SLT'):
+    def generate(self, batch_prompts: List[str], batch_imgs: Tensor, hidden_state_type: Literal['SLT'] = 'SLT'):
         config = {
             'max_new_tokens': 50,
             'do_sample': False,
@@ -37,7 +38,7 @@ class LLMGeneration():
             'output_scores': False,
             'output_logits': False,
         }
-        inputs, prompts = self.encode_prompts(batch)
+        inputs, prompts = self.encode_prompts(batch_prompts, batch_imgs)
 
         outputs = self.model.generate(
             **inputs, **config)
@@ -56,32 +57,31 @@ class LLMGeneration():
             }
         }
 
-    def encode_prompts(self, batch: Dataset):
-        if 'img_path' in batch:
+    def encode_prompts(self, batch_prompts: List[str], batch_imgs: Tensor):
+        if batch_imgs != None:
             # Vision Model
-            img_paths = batch['img_path']
-            images = [Image.open(path) for path in img_paths]
+            images = batch_imgs
 
             def apply_to_template(prompt):
                 conversation = [
                     {
                         "role": "user",
                         "content": [
-                            {"type": "image"}
-                            {"type": "text", "text": prompt},
+                            {"type": "image"},
+                            {"type": "text", "text": prompt}
                         ],
                     }]
                 return self.processor.apply_chat_template(
                     conversation, add_generation_prompt=True)
 
-            prompts = [apply_to_template(x) for x in batch['question']]
+            prompts = [apply_to_template(x) for x in batch_prompts]
 
             inputs = self.processor(images=images, text=prompts,
                                     return_tensors='pt', padding=True).to(0, torch.float16)
             return inputs, prompts
         else:
             # Language Model
-            prompts = batch['question']
+            prompts = batch_prompts
             inputs = self.processor(prompts, return_tensors="pt").to(0)
             return inputs, prompts
 
