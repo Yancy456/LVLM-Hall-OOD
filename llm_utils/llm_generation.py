@@ -67,8 +67,8 @@ class LLMGeneration():
                     {
                         "role": "user",
                         "content": [
-                            {"type": "text", "text": prompt},
                             {"type": "image"}
+                            {"type": "text", "text": prompt},
                         ],
                     }]
                 return self.processor.apply_chat_template(

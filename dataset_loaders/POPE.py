@@ -21,7 +21,7 @@ class POPEDataset():
         if category not in ["adversarial", "popular", "random"]:  # check category value
             raise ValueError(f'No such {category} in POPE dataset!')
 
-    def get_data(self) -> Dataset:
+    def get_data(self) -> list:
         data = []
         ann = read_jsonl(self.ann_path)
         data_cat = [

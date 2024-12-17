@@ -1,6 +1,7 @@
 from typing import Literal, Optional
 from .POPE import POPEDataset
 from .MMSafety import MMSafetyBench
+from .ScienceQA import ScienceQA
 from utils.prompt import Prompter
 import argparse
 from torch.utils.data import DataLoader
@@ -27,12 +28,16 @@ def load_data(dataset_name: str, prompter: Prompter,  data_folder: str,
                            data_folder, split, category).get_data()
     elif dataset_name == 'MMSafety':
         data = MMSafetyBench(prompter, data_folder, split).get_data()
+    elif dataset_name == 'ScienceQA':
+        data = ScienceQA(split).get_data()
+    else:
+        raise ValueError(f'No such dataset {dataset_name}')
 
     df = pd.DataFrame(data)
     data = HfDataset.from_pandas(df)
     indices_to_keep = []
-    for i in range(len(data)):  # check image existance
-        if os.path.isfile(data[i]['img_path']):
+    for i in range(len(data)):  # check image existence
+        if (not isinstance(data[i]['img_path'], str)) or os.path.isfile(data[i]['img_path']):
             indices_to_keep.append(i)
 
     return data.select(indices_to_keep)
@@ -48,10 +53,7 @@ class ImageDataset(Dataset):
 
     def __getitem__(self, idx):
         item = self.dataset[idx]
-        item['img_path'] = Image.open(item['img_path'])
+        item['img_path'] = Image.open(item['img_path']) if isinstance(
+            item['img_path'], str) else item['img_path']
 
         return item
-
-
-def collect_fun(batch):
-    pass
