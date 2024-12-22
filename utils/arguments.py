@@ -46,7 +46,7 @@ class Arguments:
         parser.add_argument("--num_samples", type=int,
                             help='the number of samples')
         parser.add_argument(
-            "--shuffle", type=yaml_bool, default=True, help='whether shuffle data')
+            "--shuffle", type=yaml_bool, default=False, help='whether shuffle data')
 
         # Answer judge configurations
         parser.add_argument(

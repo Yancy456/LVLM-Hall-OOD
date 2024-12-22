@@ -55,6 +55,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-    arguments = Arguments('/home/hallscope/configs/ScienceQA/train.yaml')
+    arguments = Arguments('/home/hallscope/configs/VizWiz/val.yaml')
     args = arguments.get_config()
     main(args)

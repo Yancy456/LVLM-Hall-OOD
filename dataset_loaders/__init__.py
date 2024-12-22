@@ -13,6 +13,7 @@ import pandas as pd
 from torchvision import transforms
 from .VQA import VQADataset
 from dataset_loaders.utils import data_sampler
+from .VizWiz import VizWizDataset
 
 
 def load_data(dataset_name: str, args):
@@ -36,6 +37,9 @@ def load_data(dataset_name: str, args):
     elif dataset_name == 'VQA':
         data = VQADataset(args.annotation_path,
                           args.data_folder, args.split).get_data()
+    elif dataset_name == 'VizWiz':
+        data = VizWizDataset(args.annotation_path,
+                             args.data_folder).get_data()
     else:
         raise ValueError(f'No such dataset {dataset_name}')
 
@@ -44,11 +48,11 @@ def load_data(dataset_name: str, args):
 
 # Define the custom dataset class
 class ImageDataset(Dataset):
-    def __init__(self, dataset: HfDataset, image_shape: Optional[list[int, int]] = (500, 500)):
+    def __init__(self, dataset: HfDataset, image_shape: Optional[list[int]] = None):
         self.dataset = dataset
 
         # self.img_size = image_shape
-        self.img_size = (500, 500)
+        self.img_size = image_shape
         if self.img_size == None:
             self.transform = transforms.Compose([
                 transforms.ToTensor()  # Convert PIL image to PyTorch tensor

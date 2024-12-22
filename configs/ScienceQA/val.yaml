@@ -6,7 +6,8 @@ dataset: ScienceQA
 split: validation
 prompt: oe
 theme: general
-batch_size: 2
+batch_size: 1
+num_samples: 2000
 
 temperature: 0.0
 top_p: 0.9

@@ -1,0 +1,12 @@
+model_name: LLaVA-7B
+model_path: /root/autodl-tmp/llava-1.5-7b-hf
+save_path: /root/autodl-fs/hallscope/VizWiz/train
+
+dataset: VizWiz
+annotation_path: /root/autodl-fs/vizwiz/Annotations/Annotations/train.json
+data_folder: /root/autodl-fs/vizwiz/train/train
+split: train
+prompt: oe
+theme: general
+batch_size: 1
+num_samples: 2000

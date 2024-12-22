@@ -6,7 +6,7 @@ dataset: ScienceQA
 split: train
 prompt: oe
 theme: general
-batch_size: 8
+batch_size: 1 # ScienceQA is no recommended for batch processing
 num_samples: 5000
 
 temperature: 0.0

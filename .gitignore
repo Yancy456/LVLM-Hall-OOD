@@ -3,3 +3,8 @@
 output/*
 .mypy_cache/*
 nohup.out
+*.json
+*.jpg
+*.png
+API/*
+*.zip
