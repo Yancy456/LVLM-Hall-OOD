@@ -18,7 +18,7 @@ class ScienceQA():
         choices = ' '.join([f'{letters[i]}.{q}' for i, q in enumerate(answer)])
         return prompt % (question, choices)
 
-    def get_data(self) -> Dataset:
+    def get_data(self) -> list:
         def transform_example(ins):
             return {
                 "img": ins['image'],
@@ -29,6 +29,7 @@ class ScienceQA():
         # Use map to apply the transformation to the dataset
         transformed = self.dataset.map(transform_example, num_proc=8, remove_columns=[
                                        'choices', 'solution', 'task', 'lecture', 'skill', 'task', 'hint', 'grade', 'topic', 'subject', 'image', 'category'])
+
         return transformed
 
 

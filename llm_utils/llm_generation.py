@@ -75,9 +75,9 @@ class LLMGeneration():
                     conversation, add_generation_prompt=True)
 
             prompts = [apply_to_template(x) for x in batch_prompts]
-
+            # WARNING: do_rescale MUST be False, because transforms.ToTensor() already done that
             inputs = self.processor(images=images, text=prompts,
-                                    return_tensors='pt', padding=True).to(0, torch.float16)
+                                    return_tensors='pt', padding=True, do_rescale=False).to(0, torch.float16)
             return inputs, prompts
         else:
             # Language Model

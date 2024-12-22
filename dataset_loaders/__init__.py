@@ -11,10 +11,11 @@ from datasets import Dataset as HfDataset
 from PIL import Image
 import pandas as pd
 from torchvision import transforms
+from .VQA import VQADataset
+from dataset_loaders.utils import data_sampler
 
 
-def load_data(dataset_name: str, prompter: Prompter,  data_folder: str,
-              split: Literal['train', 'val', 'test'],  annotation_path: Optional[str] = None, category: Optional[str] = None):
+def load_data(dataset_name: str, args):
     '''
     Load data from dataset 'dataset_name'.
     prompter: Prompter used to construct prompts
@@ -25,32 +26,38 @@ def load_data(dataset_name: str, prompter: Prompter,  data_folder: str,
     '''
 
     if dataset_name == 'POPE':
-        data = POPEDataset(annotation_path,
-                           data_folder, split, category).get_data()
+        data = POPEDataset(args.annotation_path,
+                           args.data_folder, args.split, args.category).get_data()
     elif dataset_name == 'MMSafety':
-        data = MMSafetyBench(prompter, data_folder, split).get_data()
+        data = MMSafetyBench(
+            args.prompter, args.data_folder, args.split).get_data()
     elif dataset_name == 'ScienceQA':
-        data = ScienceQA(split).get_data()
+        data = ScienceQA(args.split).get_data()
+    elif dataset_name == 'VQA':
+        data = VQADataset(args.annotation_path,
+                          args.data_folder, args.split).get_data()
     else:
         raise ValueError(f'No such dataset {dataset_name}')
 
-    # indices_to_keep = []
-    # for i in range(len(data)):  # check image existence
-    #    if (not isinstance(data[i]['img_path'], str)) or os.path.isfile(data[i]['img_path']):
-    #        indices_to_keep.append(i)
     return data
-    # return data.select(indices_to_keep)
 
 
 # Define the custom dataset class
 class ImageDataset(Dataset):
-    def __init__(self, dataset: HfDataset):
+    def __init__(self, dataset: HfDataset, image_shape: Optional[list[int, int]] = (500, 500)):
         self.dataset = dataset
-        self.img_size = (400, 400)
-        self.transform = transforms.Compose([
-            transforms.Resize(self.img_size),
-            transforms.ToTensor()  # Convert PIL image to PyTorch tensor
-        ])
+
+        # self.img_size = image_shape
+        self.img_size = (500, 500)
+        if self.img_size == None:
+            self.transform = transforms.Compose([
+                transforms.ToTensor()  # Convert PIL image to PyTorch tensor
+            ])
+        else:
+            self.transform = transforms.Compose([
+                transforms.Resize(self.img_size),
+                transforms.ToTensor()  # Convert PIL image to PyTorch tensor
+            ])
 
     def __len__(self):
         return len(self.dataset)
@@ -58,14 +65,11 @@ class ImageDataset(Dataset):
     def __getitem__(self, idx):
         item = self.dataset[idx]
         if 'img_path' in item:
-            image = Image.open(item['img_path'])
-        else:
-            image = item['img']
+            item['img'] = Image.open(item['img_path']).convert('RGB')
 
-        if item['img'] == None:
+        if not 'img' in item or item['img'] == None:
             # create black image if no image input
-            image = Image.new("RGB", self.img_size, color=(255, 255, 255))
-
-        item['img'] = self.transform(image)
+            item['img'] = Image.new("RGB", (500, 500), color=(255, 255, 255))
+        item['img'] = self.transform(item['img'])
 
         return item

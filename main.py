@@ -15,12 +15,13 @@ from torch.utils.data import DataLoader
 def main(args):
     # Load dataset
     prompter = Prompter(args.prompt, args.theme)
-    data = load_data(args.dataset, prompter, args.data_folder, args.split,
-                     args.annotation_path, args.category)  # type: Dataset
+    data = load_data(args.dataset, args)
+
     if args.num_samples is not None:
         data = data_sampler(
             data, num_samples=args.num_samples, shuffle=args.shuffle)
-    image_dataset = ImageDataset(data)
+
+    image_dataset = ImageDataset(data, args.image_shape)
     data_loader = DataLoader(
         image_dataset, batch_size=args.batch_size, shuffle=False, pin_memory=True)
 
@@ -54,6 +55,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-    arguments = Arguments('./configs/ScienceQA/train.yaml')
+    arguments = Arguments('/home/hallscope/configs/ScienceQA/train.yaml')
     args = arguments.get_config()
     main(args)
