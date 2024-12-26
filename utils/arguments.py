@@ -5,6 +5,11 @@ from yaml_arguments.argument_base import yaml_bool
 cfg = None  # global sharing configurations
 
 
+def image_shape(s: str):
+    shape = [int(x) for x in s.split(',')]
+    return shape
+
+
 class Arguments:
     def __init__(self, default_config=None) -> None:
         self.default_config = default_config
@@ -20,13 +25,14 @@ class Arguments:
     def yaml_config(self, dict):
         parser = argparse.ArgumentParser()
 
-        # Model name and path
+        # Model configs and path
         parser.add_argument("--model_name", required=True, type=str)
         parser.add_argument(
             "--model_path", required=True, type=str)
-
         parser.add_argument(
-            "--image_shape", required=False, default=None, type=str)
+            "--image_shape", required=False, default=None, type=image_shape)
+        parser.add_argument(
+            "--n_multi_gene", required=False, default=0, type=int)
 
         # Dataset configurations
         parser.add_argument("--dataset", required=True, type=str)
@@ -57,7 +63,6 @@ class Arguments:
         parser.add_argument("--temperature", type=float, default=0.0)
         parser.add_argument("--top_p", type=float, default=0.9)
         parser.add_argument("--num_beams", type=int, default=1)
-
         parser.add_argument("--token_id", type=int, default=0,
                             help='the index of token that is used to classification. 0 means the first token.')
 

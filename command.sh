@@ -12,3 +12,7 @@ python main.py --config ./configs/ScienceQA/val.yaml
 python main.py --config ./configs/ScienceQA/test.yaml
 
 python main.py --config ./configs/VQA/train.yaml
+
+python main.py --config ./configs/VizWiz/train.yaml
+
+python main.py --config /home/hallscope/configs/AOKVQA/train.yaml

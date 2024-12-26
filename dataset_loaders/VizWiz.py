@@ -23,11 +23,22 @@ class VizWizDataset():
         data_cat = [
             {
                 "img_path": os.path.join(self.img_root, ins['image']),
-                "question": f"{ins['question']}\nAnswer the question using a single word or phrase.\n",
+                "question": self.prompter(ins['question']),
+                "answer_type": ins['answer_type'],
                 "answers": ins['answers']
             }
-            for ins in tqdm(ann) if ins['answerable'] == 1
+            for ins in tqdm(ann)
         ]
         data += data_cat
 
         return data
+
+    def prompter(self, question: str, prompt_type: Literal['answerable', 'open_end'] = 'answerable'):
+        answerable_prompt = "Given the question '%s', is the question answerable or unanswerable based on the image?\nPlease reply with 'Unanswerable' or 'Answerable'."
+        open_end_prompt = '%s\nAnswer the question using a single word or phrase.\n'
+        if prompt_type == 'answerable':
+            return answerable_prompt % question
+        elif prompt_type == 'open_end':
+            return open_end_prompt % question
+        else:
+            raise ValueError(f'prompt type {prompt_type} no supported')

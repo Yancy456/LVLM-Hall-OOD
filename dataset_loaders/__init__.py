@@ -14,6 +14,7 @@ from torchvision import transforms
 from .VQA import VQADataset
 from dataset_loaders.utils import data_sampler
 from .VizWiz import VizWizDataset
+from .AOKVQA import AOKVQADataset
 
 
 def load_data(dataset_name: str, args):
@@ -39,6 +40,9 @@ def load_data(dataset_name: str, args):
                           args.data_folder, args.split).get_data()
     elif dataset_name == 'VizWiz':
         data = VizWizDataset(args.annotation_path,
+                             args.data_folder).get_data()
+    elif dataset_name == 'AOKVQA':
+        data = AOKVQADataset(args.annotation_path,
                              args.data_folder).get_data()
     else:
         raise ValueError(f'No such dataset {dataset_name}')

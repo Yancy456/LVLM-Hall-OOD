@@ -32,14 +32,15 @@ def main(args):
 
     # Generate responses and embeddings
     for batch in tqdm(data_loader):
-        results = llm_generation.generate(batch['question'], batch['img'])
+        results = llm_generation.multi_generate(
+            batch['question'], batch['img'], n_multi_gene=args.n_multi_gene)
 
         batch.update(results)
         del batch['img']
         '''
         ins={
         'img_path':the path of input image
-        'img':the image tensor
+        'img':the image tensor (no stored)
         'question': the question
         'answers':[a list of example answers]
         'most_likely':{
@@ -47,7 +48,6 @@ def main(args):
             'embedding': hidden_states
         },
         'responses':[other generation sequences],
-        'label':boolean
         '...': other dataset specific keys
         }
         '''
@@ -55,6 +55,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-    arguments = Arguments('/home/hallscope/configs/VizWiz/val.yaml')
+    arguments = Arguments('/home/hallscope/configs/VizWiz/train.yaml')
     args = arguments.get_config()
     main(args)

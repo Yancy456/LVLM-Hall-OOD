@@ -57,6 +57,56 @@ class LLMGeneration():
             }
         }
 
+    def multi_generate(self, batch_prompts: List[str], batch_imgs: Tensor, n_multi_gene: int = 0, hidden_state_type: Literal['SLT'] = 'SLT'):
+        config = {
+            'max_new_tokens': 50,
+            'do_sample': False,
+            # 'stop_strings': ['\n'],
+            'return_dict_in_generate': True,
+            'output_hidden_states': True,
+            'output_scores': False,
+            'output_logits': False,
+        }
+        inputs, prompts = self.encode_prompts(batch_prompts, batch_imgs)
+
+        outputs = self.model.generate(
+            **inputs, **config)
+
+        hidden_states = self.phrase_hidden_states(outputs.hidden_states)
+
+        most_likely_response = self.processor.batch_decode(
+            outputs.sequences, skip_special_tokens=True)
+        most_likely_response = self.phrase_responses(
+            most_likely_response, prompts)
+
+        if n_multi_gene > 0:
+            '''whether to generate more than one answers, typically used for Semantic Analysis'''
+            config = {
+                'max_new_tokens': 50,
+                'do_sample': True,
+                'temperature': 1.0,
+                'num_return_sequences': n_multi_gene,
+                'return_dict_in_generate': True,
+                'output_hidden_states': False,
+                'output_scores': False,
+                'output_logits': False,
+            }
+
+            outputs = self.model.generate(
+                **inputs, **config)
+            all_responses = self.processor.batch_decode(
+                outputs.sequences, skip_special_tokens=True)
+            all_responses = self.phrase_responses(
+                all_responses, prompts)
+
+        return {
+            "most_likely": {
+                'embedding': hidden_states,
+                'response': most_likely_response
+            },
+            'responses': all_responses
+        }
+
     def encode_prompts(self, batch_prompts: List[str], batch_imgs: Tensor):
         if batch_imgs != None:
             # Vision Model
