@@ -8,5 +8,6 @@ data_folder: /root/autodl-fs/coco_images/train
 split: train
 prompt: oe
 theme: general
-batch_size: 2
-num_samples: 10000
+batch_size: 8
+image_shape: "640,480"
+num_samples: 20000

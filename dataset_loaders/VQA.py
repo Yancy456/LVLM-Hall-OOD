@@ -34,4 +34,9 @@ class VQADataset():
         ]
         data += data_cat
 
-        return data
+        existing_data = []
+        for ins in tqdm(data):
+            if os.path.exists(ins['img_path']):
+                existing_data.append(ins)
+        print(f'existing files: {len(existing_data)}')
+        return existing_data
