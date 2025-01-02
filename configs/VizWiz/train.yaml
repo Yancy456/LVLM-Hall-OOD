@@ -11,4 +11,4 @@ theme: general
 image_shape: "500,500"
 batch_size: 1
 num_samples: 10000
-n_multi_gene: 10
+n_multi_gene: 6

@@ -77,8 +77,9 @@ class LLMGeneration():
         most_likely_response = self.processor.batch_decode(
             outputs.sequences, skip_special_tokens=True)
         most_likely_response = self.phrase_responses(
-            most_likely_response, prompts)
+            most_likely_response, prompts, 1)
 
+        all_responses = None
         if n_multi_gene > 0:
             '''whether to generate more than one answers, typically used for Semantic Analysis'''
             config = {
@@ -97,7 +98,7 @@ class LLMGeneration():
             all_responses = self.processor.batch_decode(
                 outputs.sequences, skip_special_tokens=True)
             all_responses = self.phrase_responses(
-                all_responses, prompts)
+                all_responses, prompts, n_multi_gene)
 
         return {
             "most_likely": {
@@ -153,7 +154,7 @@ class LLMGeneration():
             # shape=(batch_size,layers,n_hidden)
         return hidden_states
 
-    def phrase_responses(self, responses: List[str], prompts: List[str]) -> List[str]:
+    def phrase_responses(self, responses: List[str], prompts: List[str], n_multi_gene: int) -> List[str]:
         '''remove reluctant words and only keep response without prompts'''
         def phraser(i, x):
             prompt = prompts[i].replace('<image>', ' ')
@@ -164,7 +165,8 @@ class LLMGeneration():
 
         rsps = []
         for i, x in enumerate(responses):
-            x = phraser(i, x)
+            # divide n_multi_gene to process batch data
+            x = phraser(i//n_multi_gene, x)
             rsps.append(x)
         return rsps
 

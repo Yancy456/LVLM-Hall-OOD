@@ -2,6 +2,7 @@ from .triviaQA_judge import TriviaQAJudge
 # from .bleurt import TriviaQAHaloJudge
 from .MMSafety_judge import MMSafetyJudge
 from .ScienceQA import ScienceQAJudge
+from .OKVQA import OKVQAJudge
 
 
 def load_judge(dataset, prompt_type=None):
@@ -13,5 +14,7 @@ def load_judge(dataset, prompt_type=None):
         return TriviaQAHaloJudge(self.model_path)
     elif dataset == 'ScienceQA':
         return ScienceQAJudge()
+    elif dataset == 'OKVQA':
+        return OKVQAJudge()
     else:
         raise ValueError(f'no judge for {dataset}')
