@@ -57,7 +57,7 @@ class LLMGeneration():
             }
         }
 
-    def multi_generate(self, batch_prompts: List[str], batch_imgs: Tensor, n_multi_gene: int = 0, hidden_state_type: Literal['SLT'] = 'SLT'):
+    def multi_generate(self, batch_prompts: List[str], batch_imgs: Tensor, args):
         config = {
             'max_new_tokens': 50,
             'do_sample': False,
@@ -65,7 +65,7 @@ class LLMGeneration():
             'return_dict_in_generate': True,
             'output_hidden_states': True,
             'output_scores': False,
-            'output_logits': False,
+            'output_logits': args.return_logits,
         }
         inputs, prompts = self.encode_prompts(batch_prompts, batch_imgs)
 
@@ -79,14 +79,20 @@ class LLMGeneration():
         most_likely_response = self.phrase_responses(
             most_likely_response, prompts, 1)
 
+        '''
+        outputs.logits=Tuple(logits1,tensor2,...). Tuple contains each generation
+        logits1.shape=(batch,num_vocabulary)
+        '''
+        most_likely_logits = outputs.logits[0]
+
         all_responses = None
-        if n_multi_gene > 0:
+        if args.n_multi_gene > 0:
             '''whether to generate more than one answers, typically used for Semantic Analysis'''
             config = {
                 'max_new_tokens': 50,
                 'do_sample': True,
                 'temperature': 1.0,
-                'num_return_sequences': n_multi_gene,
+                'num_return_sequences': args.n_multi_gene,
                 'return_dict_in_generate': True,
                 'output_hidden_states': False,
                 'output_scores': False,
@@ -98,12 +104,13 @@ class LLMGeneration():
             all_responses = self.processor.batch_decode(
                 outputs.sequences, skip_special_tokens=True)
             all_responses = self.phrase_responses(
-                all_responses, prompts, n_multi_gene)
+                all_responses, prompts, args.n_multi_gene)
 
         return {
             "most_likely": {
                 'embedding': hidden_states,
-                'response': most_likely_response
+                'response': most_likely_response,
+                'logits': most_likely_logits
             },
             'responses': all_responses
         }

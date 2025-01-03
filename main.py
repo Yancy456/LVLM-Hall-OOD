@@ -25,7 +25,7 @@ def main(args):
     data_loader = DataLoader(
         image_dataset, batch_size=args.batch_size, shuffle=False, pin_memory=True)
 
-    # Load LLM and answer judge
+    # Load LLM
     model, processor = load_llm(args.model_name, args.model_path)
     llm_generation = LLMGeneration(model, processor)
     store_data = StoreData(args.save_path)
@@ -33,7 +33,7 @@ def main(args):
     # Generate responses and embeddings
     for batch in tqdm(data_loader):
         results = llm_generation.multi_generate(
-            batch['question'], batch['img'], n_multi_gene=args.n_multi_gene)
+            batch['question'], batch['img'], args)
 
         batch.update(results)
         del batch['img']
@@ -55,6 +55,7 @@ def main(args):
 
 
 if __name__ == "__main__":
-    arguments = Arguments('/home/hallscope/configs/VizWiz/train.yaml')
+    arguments = Arguments(
+        '/home/hallscope/configs/pope/train_popular_multi.yaml')
     args = arguments.get_config()
     main(args)

@@ -14,7 +14,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from uncertainty.models.huggingface_models import HuggingfaceModel
 # from uncertainty.utils import openai as oai
 from uncertainty.utils import utils
-
+from llm_utils.llm_loader import load_llm
 
 random.seed(10)
 
@@ -55,48 +55,10 @@ class EntailmentDeberta(BaseEntailment):
 
 
 class EntailmentLLM(BaseEntailment):
-    entailment_file = 'entailment_cache.pkl'
-
-    def __init__(self, entailment_cache_id, entailment_cache_only):
-        self.prediction_cache = self.init_prediction_cache(entailment_cache_id)
-        self.entailment_cache_only = entailment_cache_only
-
-    def init_prediction_cache(self, entailment_cache_id):
-        if entailment_cache_id is None:
-            return dict()
-
-        logging.info('Restoring prediction cache from %s', entailment_cache_id)
-
-        api = wandb.Api()
-        run = api.run(entailment_cache_id)
-        run.file(self.entailment_file).download(
-            replace=True, exist_ok=False, root=wandb.run.dir)
-
-        with open(f'{wandb.run.dir}/{self.entailment_file}', "rb") as infile:
-            return pickle.load(infile)
-
-    def save_prediction_cache(self):
-        # write the dictionary to a pickle file
-        utils.save(self.prediction_cache, self.entailment_file)
-
     def check_implication(self, text1, text2, example=None):
-        if example is None:
-            raise ValueError
-        prompt = self.equivalence_prompt(text1, text2, example['question'])
+        prompt = self.equivalence_prompt(text1, text2, None)
 
-        logging.info('%s input: %s', self.name, prompt)
-
-        hashed = oai.md5hash(prompt)
-        if hashed in self.prediction_cache:
-            logging.info('Restoring hashed instead of predicting with model.')
-            response = self.prediction_cache[hashed]
-        else:
-            if self.entailment_cache_only:
-                raise ValueError
-            response = self.predict(prompt, temperature=0.02)
-            self.prediction_cache[hashed] = response
-
-        logging.info('%s prediction: %s', self.name, response)
+        response = self.predict(prompt, temperature=0.02)
 
         binary_response = response.lower()[:30]
         if 'entailment' in binary_response:
@@ -116,12 +78,9 @@ class EntailmentGPT4(EntailmentLLM):
         super().__init__(entailment_cache_id, entailment_cache_only)
         self.name = 'gpt-4'
 
-    def equivalence_prompt(self, text1, text2, question):
-
-        prompt = f"""We are evaluating answers to the question \"{question}\"\n"""
-
+    def equivalence_prompt(self, text1, text2):
         # To precise.
-        prompt += "Here are two possible answers:\n"
+        prompt = "Here are two possible answers:\n"
         # Ah! This is much closer to what we are doing!
         # prompt = prompt + f"""Does at least one of the following two possible answers entail the other?
         # Still to precise.
@@ -143,11 +102,8 @@ class EntailmentGPT35(EntailmentGPT4):
 
 class EntailmentLlama(EntailmentLLM):
 
-    def __init__(self, entailment_cache_id, entailment_cache_only, name):
-        super().__init__(entailment_cache_id, entailment_cache_only)
-        self.name = name
-        self.model = HuggingfaceModel(
-            name, stop_sequences='default', max_new_tokens=30)
+    def __init__(self, name_or_path):
+        self.model, self.processor = load_llm('LLaVA-7B', name_or_path)
 
     def equivalence_prompt(self, text1, text2, question):
         prompt = f"""We are evaluating answers to the question \"{question}\"\n"""
@@ -159,8 +115,11 @@ class EntailmentLlama(EntailmentLLM):
         return prompt
 
     def predict(self, prompt, temperature):
-        predicted_answer, _, _ = self.model.predict(prompt, temperature)
-        return predicted_answer
+        inputs = self.processor(prompt, return_tensors="pt").to(0)
+        with torch.no_grad():
+            outputs = self.model(**inputs)
+
+        return outputs
 
 
 def context_entails_response(context, responses, model):

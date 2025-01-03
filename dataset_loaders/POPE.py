@@ -8,6 +8,7 @@ from typing import Literal, Optional
 from utils.prompt import Prompter
 import pandas as pd
 from datasets import Dataset
+from tqdm import tqdm
 
 
 class POPEDataset():
@@ -22,7 +23,6 @@ class POPEDataset():
             raise ValueError(f'No such {category} in POPE dataset!')
 
     def get_data(self) -> list:
-        data = []
         ann = read_jsonl(self.ann_path)
         data_cat = [
             {
@@ -35,5 +35,8 @@ class POPEDataset():
             for ins in ann
         ]
 
-        data += data_cat
+        data = []
+        for i in tqdm(range(len(data_cat))):  # check image existence
+            if os.path.isfile(data_cat[i]['img_path']):
+                data.append(data_cat[i])
         return data

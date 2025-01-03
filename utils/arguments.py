@@ -33,6 +33,8 @@ class Arguments:
             "--image_shape", required=False, default=None, type=image_shape)
         parser.add_argument(
             "--n_multi_gene", required=False, default=0, type=int)
+        parser.add_argument(
+            "--return_logits", required=False, default=False, type=yaml_bool)
 
         # Dataset configurations
         parser.add_argument("--dataset", required=True, type=str)
