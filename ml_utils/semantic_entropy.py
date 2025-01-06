@@ -26,7 +26,7 @@ def best_split(entropy: np.array, label="Dx"):
 
     split_mses = np.array(split_mses)
 
-    plt.plot(splits, split_mses, label=label)
+    # plt.plot(splits, split_mses, label=label)
     return splits[np.argmin(split_mses)]
 
 

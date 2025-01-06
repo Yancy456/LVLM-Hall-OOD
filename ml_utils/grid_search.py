@@ -27,7 +27,7 @@ class GridSearch:
         print(f"Grid Searching for best {param1[0]},{param2[0]}")
 
         for i in tqdm(param1[1]):
-            for j in param2[1]:
+            for j in tqdm(param2[1], leave=False):
                 score = self.evaluator(i, j, self.X_val, self.y_val)
                 if score > best_score:
                     print(
