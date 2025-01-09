@@ -1,4 +1,5 @@
-from tqdm import tqdm
+# from tqdm import tqdm
+from tqdm.notebook import tqdm
 
 
 class GridSearch:
