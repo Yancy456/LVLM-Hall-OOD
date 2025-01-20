@@ -15,6 +15,7 @@ from .VQA import VQADataset
 from dataset_loaders.utils import data_sampler
 from .VizWiz import VizWizDataset
 from .AOKVQA import AOKVQADataset
+from .ChartVQA import ChartVQADataset
 
 
 def load_data(dataset_name: str, args):
@@ -44,6 +45,9 @@ def load_data(dataset_name: str, args):
     elif dataset_name == 'AOKVQA':
         data = AOKVQADataset(args.annotation_path,
                              args.data_folder).get_data()
+    elif dataset_name == 'ChartVQA':
+        data = ChartVQADataset(args.annotation_path,
+                               args.data_folder).get_data()
     else:
         raise ValueError(f'No such dataset {dataset_name}')
 
@@ -75,9 +79,9 @@ class ImageDataset(Dataset):
         if 'img_path' in item:
             item['img'] = Image.open(item['img_path']).convert('RGB')
 
-        if not 'img' in item or item['img'] == None:
-            # create black image if no image input
-            item['img'] = Image.new("RGB", (500, 500), color=(255, 255, 255))
+        # if not 'img' in item or item['img'] == None:
+        #    # create black image if no image input
+        #    item['img'] = Image.new("RGB", (500, 500), color=(255, 255, 255))
         item['img'] = self.transform(item['img'])
 
         return item

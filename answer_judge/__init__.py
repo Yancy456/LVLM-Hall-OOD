@@ -3,6 +3,7 @@ from .triviaQA_judge import TriviaQAJudge
 from .MMSafety_judge import MMSafetyJudge
 from .ScienceQA import ScienceQAJudge
 from .OKVQA import OKVQAJudge
+from .ChartQA import ChartQAJudge
 
 
 def load_judge(dataset, prompt_type=None):
@@ -16,5 +17,7 @@ def load_judge(dataset, prompt_type=None):
         return ScienceQAJudge()
     elif dataset == 'OKVQA':
         return OKVQAJudge()
+    elif dataset == 'ChartQA':
+        return ChartQAJudge()
     else:
         raise ValueError(f'no judge for {dataset}')

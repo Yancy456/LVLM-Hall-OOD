@@ -65,8 +65,11 @@ class LLMGeneration():
             'return_dict_in_generate': True,
             'output_hidden_states': True,
             'output_scores': False,
+            'num_beams': args.num_beams,
+            ''
             'output_logits': args.return_logits,
         }
+
         inputs, prompts = self.encode_prompts(batch_prompts, batch_imgs)
 
         outputs = self.model.generate(
@@ -75,7 +78,7 @@ class LLMGeneration():
         hidden_states = self.phrase_hidden_states(outputs.hidden_states)
 
         most_likely_response = self.processor.batch_decode(
-            outputs.sequences, skip_special_tokens=True)
+            outputs.sequences)
         most_likely_response = self.phrase_responses(
             most_likely_response, prompts, 1)
 
@@ -83,7 +86,10 @@ class LLMGeneration():
         outputs.logits=Tuple(logits1,tensor2,...). Tuple contains each generation
         logits1.shape=(batch,num_vocabulary)
         '''
-        most_likely_logits = outputs.logits[0]
+        if args.return_logits:
+            most_likely_logits = outputs.logits[0]
+        else:
+            most_likely_logits = None
 
         all_responses = None
         if args.n_multi_gene > 0:
@@ -102,7 +108,7 @@ class LLMGeneration():
             outputs = self.model.generate(
                 **inputs, **config)
             all_responses = self.processor.batch_decode(
-                outputs.sequences, skip_special_tokens=True)
+                outputs.sequences)
             all_responses = self.phrase_responses(
                 all_responses, prompts, args.n_multi_gene)
 
@@ -164,10 +170,10 @@ class LLMGeneration():
     def phrase_responses(self, responses: List[str], prompts: List[str], n_multi_gene: int) -> List[str]:
         '''remove reluctant words and only keep response without prompts'''
         def phraser(i, x):
-            prompt = prompts[i].replace('<image>', ' ')
+            prompt = prompts[i]
             x = x[len(prompt):]
             x = x.replace("<pad>", "").replace(
-                "</s>", "").replace("<unk>", "").strip()
+                "</s>", "").replace("<unk>", "").replace("<|im_end|>", "").strip()
             return x
 
         rsps = []

@@ -23,8 +23,8 @@ class ChartVQADataset():
             ann = json.load(file)
         data_cat = [
             {
-                "img_path": os.path.join(self.img_root, f"{ins['imgname']}.png"),
-                "question": f"{ins['query']}\nAnswer the question using a single word or digit number rather than spelling it out.\n",
+                "img_path": os.path.join(self.img_root, f"{ins['imgname']}"),
+                "question": f"{ins['query']}\nAnswer the question using a single word or digit number.\n",
                 "answers": ins['label'],
                 "question_id": ins["imgname"]
             }

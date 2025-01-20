@@ -56,6 +56,6 @@ def main(args):
 
 if __name__ == "__main__":
     arguments = Arguments(
-        '/home/hallscope/configs/pope/train_popular_multi.yaml')
+        '/home/hallscope/configs/ChartVQA/train.yaml')
     args = arguments.get_config()
     main(args)

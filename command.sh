@@ -18,3 +18,5 @@ python main.py --config ./configs/VizWiz/train.yaml
 python main.py --config /home/hallscope/configs/AOKVQA/train.yaml
 
 python main.py --config /home/hallscope/configs/pope/train_popular_multi.yaml
+
+python main.py --config /home/hallscope/configs/ChartVQA/train.yaml

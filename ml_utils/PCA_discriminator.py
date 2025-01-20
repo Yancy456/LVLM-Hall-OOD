@@ -7,10 +7,10 @@ from typing import Literal
 from scipy.linalg import svd
 
 
-class PCADiscriminator:
+class PCAKernel:
     '''A class that uses PCA to score data'''
 
-    def __init__(self, X, n_components, kernel: Literal['poly', 'rbf'] = 'poly') -> None:
+    def __init__(self, X, n_components, kernel: Literal['poly', 'rbf', 'linear'] = 'linear') -> None:
         # X.shape= (num_samples,dimensions_of_hidden_states)
 
         pca_model = KernelPCA(n_components=n_components,
@@ -47,6 +47,39 @@ class PCADiscriminator:
         scores = self.get_score()
         preds = (scores > split)
         return accuracy_score(y, preds)
+
+
+class PCALinear:
+    '''A class that uses PCA to score data'''
+
+    def __init__(self, X, n_components) -> None:
+        # X.shape= (num_samples,dimensions_of_hidden_states)
+
+        pca_model = PCA(n_components=n_components, whiten=False).fit(X)
+        projections = pca_model.singular_values_*pca_model.components_.T
+        mean_recorded = pca_model.mean_
+
+        self.X = X
+        self.projections = projections
+
+    def get_score(self, X):
+        scores = np.mean(
+            np.matmul(X, self.projections), -1, keepdims=True)
+        assert scores.shape[1] == 1
+        scores = np.sqrt(np.sum(np.square(scores), axis=1))
+        return scores  # scores.shape=(num_samples)
+
+    def get_best_split(self, scores, y):
+        '''get best split from scores'''
+        fpr, tpr, thresholds = roc_curve(y, scores)
+
+        # Calculate Youden's J statistic
+        youdens_j = tpr - fpr
+        # Find the index of the maximum J statistic
+        best_index = np.argmax(youdens_j)
+        best_threshold = thresholds[best_index]
+
+        return best_threshold
 
 
 # class KernelPCA:
