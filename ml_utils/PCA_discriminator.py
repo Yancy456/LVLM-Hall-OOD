@@ -19,17 +19,11 @@ class PCAKernel:
         self.X = X
         self.pca = pca_model
 
-    def get_score2(self, X):
+    def get_score(self, X):
         X = self.pca.transform(X)
         scores = np.sqrt(
             np.sum(np.square(X), -1))
         return scores
-
-    def get_score(self, X):
-        scores = np.mean(
-            np.square(np.matmul(X, self.projections)), -1)
-
-        return scores  # scores.shape=(num_samples)
 
     def get_best_split(self, scores, y):
         '''get best split from scores'''
@@ -42,11 +36,6 @@ class PCAKernel:
         best_threshold = thresholds[best_index]
 
         return best_threshold
-
-    def get_acc(self, split, y):
-        scores = self.get_score()
-        preds = (scores > split)
-        return accuracy_score(y, preds)
 
 
 class PCALinear:
