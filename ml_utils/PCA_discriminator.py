@@ -71,66 +71,61 @@ class PCALinear:
         return best_threshold
 
 
-# class KernelPCA:
-#    def __init__(self, X, M, gamma, method: Literal['CoRP', 'CoP', 'origin'] = 'CoRP') -> None:
-#        '''
-#        X.shape=[n,m], n: number of samples, m: number of hidden states
-#        '''
+class KernelPCA:
+    def __init__(self, X, n_components, M, method: Literal['CoRP', 'CoP', 'origin'] = 'CoRP', gamma=1) -> None:
+        '''
+        X.shape=[n,m], n: number of samples, m: number of hidden states
+        '''
 
-#        X = self._kernel_projection(X, M, gamma, method)
-#        pca_model = PCA(n_components=None, whiten=False).fit(X)
-#        projections = pca_model.singular_values_*pca_model.components_.T
-#        mean_recorded = pca_model.mean_
+        X = self._kernel_projection(X, M, gamma, method)
+        pca_model = PCA(n_components=n_components, whiten=False).fit(X)
+        projections = pca_model.singular_values_*pca_model.components_.T
+        mean_recorded = pca_model.mean_
 
-#        self.X = X
-#        self.projections = projections
+        self.X = X
+        self.projections = projections
 
-#    def get_score(self, X, n_components):
-#        scores = np.mean(
-#            np.square(np.matmul(X, self.projections[:, :n_components])), -1)
+    def get_score(self, X):
+        scores = np.mean(
+            np.matmul(X, self.projections), -1, keepdims=True)
+        assert scores.shape[1] == 1
+        scores = np.sqrt(np.sum(np.square(scores), axis=1))
+        return scores  # scores.shape=(num_samples)
 
-#        return scores  # scores.shape=(num_samples)
+    def get_best_split(self, scores, y):
+        '''get best split from scores'''
+        fpr, tpr, thresholds = roc_curve(y, scores)
 
-#    def get_best_split(self, scores, y):
-#        '''get best split from scores'''
-#        fpr, tpr, thresholds = roc_curve(y, scores)
+        # Calculate Youden's J statistic
+        youdens_j = tpr - fpr
+        # Find the index of the maximum J statistic
+        best_index = np.argmax(youdens_j)
+        best_threshold = thresholds[best_index]
 
-#        # Calculate Youden's J statistic
-#        youdens_j = tpr - fpr
-#        # Find the index of the maximum J statistic
-#        best_index = np.argmax(youdens_j)
-#        best_threshold = thresholds[best_index]
+        return best_threshold
 
-#        return best_threshold
+    def _kernel_projection(self, X, M: int, gamma: float, method: Literal['CoRP', 'CoP', 'origin'] = 'CoRP'):
+        '''
+        X.shape=[n,m], n: number of samples, m: number of features
+        '''
+        if method == 'origin':
+            return X
 
-#    def get_acc(self, split, y):
-#        scores = self.get_score()
-#        preds = (scores > split)
-#        return accuracy_score(y, preds)
+        def normalizer(x): return x / (np.linalg.norm(x,
+                                                      ord=2, axis=-1, keepdims=True) + 1e-10)
+        if method == 'CoRP':
+            X = normalizer(X)
+            m = X.shape[1]
+            # generate M i.i.d. samples from p(w)
+            w = np.sqrt(2*gamma)*np.random.normal(size=(M, m))
+            u = 2 * np.pi * np.random.rand(M)
 
-#    def _kernel_projection(self, X, M: int, gamma: float, method: Literal['CoRP', 'CoP', 'origin'] = 'CoRP'):
-#        '''
-#        X.shape=[n,m], n: number of samples, m: number of features
-#        '''
-#        if method == 'origin':
-#            return X
-
-#        def normalizer(x): return x / (np.linalg.norm(x,
-#                                                      ord=2, axis=-1, keepdims=True) + 1e-10)
-#        X = normalizer(X)
-
-#        if method == 'CoRP':
-#            m = X.shape[1]
-#            # generate M i.i.d. samples from p(w)
-#            w = np.sqrt(2*gamma)*np.random.normal(size=(M, m))
-#            u = 2 * np.pi * np.random.rand(M)
-
-#            X = np.sqrt(2/M)*np.cos((X@w.T + u[np.newaxis, :]))
-#        elif method == 'CoP':
-#            return X
-#        else:
-#            raise ValueError('method unsupported')
-#        return X
+            X = np.sqrt(2/M)*np.cos((X@w.T + u[np.newaxis, :]))
+        elif method == 'CoP':
+            X = normalizer(X)
+            return X
+        else:
+            raise ValueError('method unsupported')
 
 
 # class KernelPCA:

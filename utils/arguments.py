@@ -56,11 +56,6 @@ class Arguments:
         parser.add_argument(
             "--shuffle", type=yaml_bool, default=False, help='whether shuffle data')
 
-        # Answer judge configurations
-        parser.add_argument(
-            "--judge_type", choices=['no_judge', 'belurt'], default='no_judge')
-        parser.add_argument("--judge_path", type=str)
-
         # LLM generation configurations
         parser.add_argument("--temperature", type=float, default=0.0)
         parser.add_argument("--top_p", type=float, default=0.9)

@@ -12,51 +12,6 @@ class LLMGeneration():
         self.model = model
         self.processor = processor
 
-        self.generation_cfg = {  # default generation configuration
-            'max_new_tokens': 50,
-            'stop_strings': ['\n'],
-
-            # sampling strategy
-            'do_sample': True,
-            'top_p': 1.0,
-            'temperature': 0.1,
-
-            # return formation
-            'return_dict_in_generate': True,
-            'output_hidden_states': True,
-            'output_scores': False,
-            'output_logits': False
-        }
-
-    def generate(self, batch_prompts: List[str], batch_imgs: Tensor, hidden_state_type: Literal['SLT'] = 'SLT'):
-        config = {
-            'max_new_tokens': 50,
-            'do_sample': False,
-            # 'stop_strings': ['\n'],
-            'return_dict_in_generate': True,
-            'output_hidden_states': True,
-            'output_scores': False,
-            'output_logits': False,
-        }
-        inputs, prompts = self.encode_prompts(batch_prompts, batch_imgs)
-
-        outputs = self.model.generate(
-            **inputs, **config)
-
-        hidden_states = self.phrase_hidden_states(outputs.hidden_states)
-
-        most_likely_response = self.processor.batch_decode(
-            outputs.sequences, skip_special_tokens=True)
-        most_likely_response = self.phrase_responses(
-            most_likely_response, prompts)
-
-        return {
-            "most_likely": {
-                'embedding': hidden_states,
-                'response': most_likely_response
-            }
-        }
-
     def multi_generate(self, batch_prompts: List[str], batch_imgs: Tensor, args):
         config = {
             'max_new_tokens': 50,
@@ -66,7 +21,6 @@ class LLMGeneration():
             'output_hidden_states': True,
             'output_scores': False,
             'num_beams': args.num_beams,
-            ''
             'output_logits': args.return_logits,
         }
 
