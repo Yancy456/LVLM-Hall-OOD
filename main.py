@@ -10,11 +10,11 @@ from dataset_loaders.utils import data_sampler
 import os
 from datasets import Dataset
 from torch.utils.data import DataLoader
+from utils.seed import fix_seed
 
 
 def main(args):
     # Load dataset
-    prompter = Prompter(args.prompt, args.theme)
     data = load_data(args.dataset, args)
 
     if args.num_samples is not None:
@@ -57,4 +57,5 @@ def main(args):
 if __name__ == "__main__":
     arguments = Arguments('/home/hallscope/configs/VQA/train_qwen.yaml')
     args = arguments.get_config()
+    fix_seed(0)
     main(args)

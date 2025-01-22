@@ -16,12 +16,12 @@ from dataset_loaders.utils import data_sampler
 from .VizWiz import VizWizDataset
 from .AOKVQA import AOKVQADataset
 from .ChartVQA import ChartVQADataset
+from .DocVQA import DocVQADataset
 
 
 def load_data(dataset_name: str, args):
     '''
     Load data from dataset 'dataset_name'.
-    prompter: Prompter used to construct prompts
     annotation_path: the path of annotation file
     data_folder:  the path of data folder
     split: choose from train, val or test set
@@ -48,6 +48,8 @@ def load_data(dataset_name: str, args):
     elif dataset_name == 'ChartVQA':
         data = ChartVQADataset(args.annotation_path,
                                args.data_folder).get_data()
+    elif dataset_name == 'DocVQA':
+        data = DocVQADataset(args.split).get_data()
     else:
         raise ValueError(f'No such dataset {dataset_name}')
 
@@ -56,7 +58,7 @@ def load_data(dataset_name: str, args):
 
 # Define the custom dataset class
 class ImageDataset(Dataset):
-    def __init__(self, dataset: HfDataset, image_shape: Optional[list[int]] = None):
+    def __init__(self, dataset: list, image_shape: Optional[list[int]] = None):
         self.dataset = dataset
 
         # self.img_size = image_shape
@@ -77,11 +79,9 @@ class ImageDataset(Dataset):
     def __getitem__(self, idx):
         item = self.dataset[idx]
         if 'img_path' in item:
-            item['img'] = Image.open(item['img_path']).convert('RGB')
+            item['img'] = Image.open(item['img_path'])
 
-        # if not 'img' in item or item['img'] == None:
-        #    # create black image if no image input
-        #    item['img'] = Image.new("RGB", (500, 500), color=(255, 255, 255))
+        item['img'] = item['img'].convert('RGB')
         item['img'] = self.transform(item['img'])
 
         return item

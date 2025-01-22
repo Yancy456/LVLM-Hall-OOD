@@ -136,10 +136,3 @@ class LLMGeneration():
             x = phraser(i//n_multi_gene, x)
             rsps.append(x)
         return rsps
-
-    def set_config(self, **new_config):
-        '''set new config for generation'''
-        new_cfg = self.generation_cfg.copy(
-        )  # Copy the old dictionary new_dict.update(additional_keys)
-        new_cfg.update(new_config)
-        return new_cfg

@@ -44,8 +44,6 @@ class Arguments:
                             required=False, type=str, default=None)
 
         parser.add_argument("--split", default="val", type=str)
-        parser.add_argument("--prompt", type=str, default=None)
-        parser.add_argument("--theme", type=str, default=None)
         parser.add_argument("--category", type=str, default=None)
         parser.add_argument(
             "--save_path", required=True, type=str)

@@ -5,7 +5,6 @@ class ChartQAJudge:
         pass
 
     def check(self, response: str, answer: str):
-
         def process_str(s):
             try:
                 # Attempt to convert the string to a float

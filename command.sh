@@ -23,3 +23,8 @@ python main.py --config /home/hallscope/configs/AOKVQA/train.yaml
 python main.py --config /home/hallscope/configs/pope/train_popular_multi.yaml
 
 python main.py --config /home/hallscope/configs/ChartVQA/train.yaml
+
+
+
+python main.py --config /home/hallscope/configs/DocVQA/val.yaml
+python main.py --config /home/hallscope/configs/DocVQA/test.yaml
