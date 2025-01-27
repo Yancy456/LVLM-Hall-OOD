@@ -1,0 +1,10 @@
+model_name: QWen2-VL
+model_path: Qwen/Qwen2-VL-7B-Instruct
+save_path: /root/autodl-tmp/hallscope/DocVQA/train
+
+dataset: DocVQA
+annotation_path: /root/autodl-tmp/train/train_v1.0.json
+data_folder: /root/autodl-tmp/train
+batch_size: 1
+num_samples: 20000
+image_shape: "900,900"

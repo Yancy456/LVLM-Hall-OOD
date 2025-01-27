@@ -121,6 +121,7 @@ class KernelPCA:
             u = 2 * np.pi * np.random.rand(M)
 
             X = np.sqrt(2/M)*np.cos((X@w.T + u[np.newaxis, :]))
+            return X
         elif method == 'CoP':
             X = normalizer(X)
             return X

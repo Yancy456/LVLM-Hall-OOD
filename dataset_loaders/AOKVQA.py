@@ -10,33 +10,30 @@ import json
 
 
 class AOKVQADataset():
-    def __init__(self, annotation_path: str, data_folder: StopIteration):
+    def __init__(self, split: Literal['train', 'validation']):
         '''Multiple-choices answering dataset'''
-        self.ann_path = annotation_path
-        self.data_folder = data_folder
+        self.split = split
+        self.dataset = load_dataset('HuggingFaceM4/A-OKVQA', split=split)
 
     def prompter(self, question: str, answer: list):
         letters = ['A', 'B', 'C', 'D', 'E']
         choices = ' '.join([f'{letters[i]}.{q}' for i, q in enumerate(answer)])
         return prompt % (question, choices)
 
-    def get_data(self) -> list:
+    def get_data(self) -> Dataset:
 
-        with open(self.ann_path, 'r') as file:
-            ann = json.load(file)
-        data_cat = [
-            {
-                "img_path": os.path.join(self.data_folder, f"{ins['image_id']:012}.jpg"),
-                "question": self.prompter(ins['question'], ins['choices']),
-                "answer": ins['correct_choice_idx']
-            }
-            for ins in tqdm(ann)
-        ]
+        def transform(x):
+            x['img'] = x['image']
+            x['answer'] = x['correct_choice_idx']
+            x['question'] = self.prompter(x['question'], x['choices'])
+            return x
 
-        data = []
-        for i in tqdm(range(len(data_cat))):  # check image existence
-            if os.path.isfile(data_cat[i]['img_path']):
-                data.append(data_cat[i])
+        data = self.dataset.map(transform, num_proc=8)
+        cols_to_remove = data.column_names
+        cols_to_remove.remove("img")
+        cols_to_remove.remove("answer")
+        cols_to_remove.remove("question")
+        data = data.remove_columns(cols_to_remove)
 
         return data
 

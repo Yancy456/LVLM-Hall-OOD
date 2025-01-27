@@ -10,5 +10,6 @@ def data_sampler(dataset, num_samples: int, shuffle: bool):
             random.shuffle(dataset)
         return dataset[:num_samples]
     else:  # huggingface Dataset
-        dataset.shuffle()
+        if shuffle:
+            dataset.shuffle()
         return dataset.select(range(num_samples))

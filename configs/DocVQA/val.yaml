@@ -1,8 +1,0 @@
-model_name: QWen2-VL
-model_path: Qwen/Qwen2-VL-7B-Instruct
-save_path: /root/autodl-tmp/hallscope/DocVQA/val
-
-dataset: DocVQA
-split: validation
-batch_size: 1
-image_shape: "700,700"

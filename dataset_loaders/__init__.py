@@ -43,13 +43,12 @@ def load_data(dataset_name: str, args):
         data = VizWizDataset(args.annotation_path,
                              args.data_folder).get_data()
     elif dataset_name == 'AOKVQA':
-        data = AOKVQADataset(args.annotation_path,
-                             args.data_folder).get_data()
+        data = AOKVQADataset(args.split).get_data()
     elif dataset_name == 'ChartVQA':
         data = ChartVQADataset(args.annotation_path,
                                args.data_folder).get_data()
     elif dataset_name == 'DocVQA':
-        data = DocVQADataset(args.split).get_data()
+        data = DocVQADataset(args.annotation_path, args.data_folder).get_data()
     else:
         raise ValueError(f'No such dataset {dataset_name}')
 
@@ -77,7 +76,7 @@ class ImageDataset(Dataset):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        item = self.dataset[idx]
+        item = self.dataset[idx].copy()
         if 'img_path' in item:
             item['img'] = Image.open(item['img_path'])
 

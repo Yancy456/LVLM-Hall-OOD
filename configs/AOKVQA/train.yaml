@@ -1,12 +1,8 @@
-model_name: LLaVA-7B
-model_path: /root/autodl-tmp/llava-1.5-7b-hf
+model_name: QWen2-VL
+model_path: Qwen/Qwen2-VL-7B-Instruct
 save_path: /root/autodl-tmp/hallscope/AOKVQA/train
 
 dataset: AOKVQA
-annotation_path: /home/hallscope/data/AOKVQA/aokvqa_v1p0_train.json
-data_folder: /root/autodl-tmp/coco2017/train2017
 split: train
-prompt: oe
-theme: general
-image_shape: "640,480"
-batch_size: 8
+image_shape: "600,640"
+batch_size: 1

@@ -55,7 +55,7 @@ def main(args):
 
 
 if __name__ == "__main__":
-    arguments = Arguments('/home/hallscope/configs/VQA/train_qwen.yaml')
+    arguments = Arguments('/home/hallscope/configs/AOKVQA/train.yaml')
     args = arguments.get_config()
     fix_seed(0)
     main(args)

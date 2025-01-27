@@ -21,6 +21,7 @@ import random
 import os
 import warnings
 from dataset_loaders.VQA import VQADataset
+from dataset_loaders.ChartVQA import ChartVQADataset
 warnings.filterwarnings("ignore")
 
 
@@ -42,7 +43,8 @@ BENCHMARK_MAP = {
     'LLaVABench': LLaVABench,
     'MMMU': MMMU,
     'ScienceQA': ScienceQA,
-    'VQA': lambda: VQADataset('/home/hallscope/data/VQA/v2_train.json', '/root/autodl-fs/coco_images/train', 'train')
+    'VQA': lambda: VQADataset('/home/hallscope/data/VQA/v2_train.json', '/root/autodl-fs/coco_images/train', 'train'),
+    'ChartVQA': lambda: ChartVQADataset('/root/autodl-tmp/ChartVQA/train/train_augmented.json', '/root/autodl-tmp/ChartVQA/train/png')
 }
 
 LLM_MAP = {
