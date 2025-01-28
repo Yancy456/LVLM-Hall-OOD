@@ -5,6 +5,7 @@ from .ScienceQA import ScienceQAJudge
 from .OKVQA import OKVQAJudge
 from .ChartQA import ChartQAJudge
 from .DocVQA import DocVQAJudge
+from .InfoVQA import InfoVQAJudge
 
 
 def load_judge(dataset, model_name=None):
@@ -22,5 +23,7 @@ def load_judge(dataset, model_name=None):
         return ChartQAJudge()
     elif dataset == 'DocVQA':
         return DocVQAJudge(model_name)
+    elif dataset == 'InfoVQA':
+        return InfoVQAJudge()
     else:
         raise ValueError(f'no judge for {dataset}')

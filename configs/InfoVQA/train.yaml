@@ -1,0 +1,7 @@
+model_name: QWen2-VL
+model_path: Qwen/Qwen2-VL-7B-Instruct
+save_path: /root/autodl-tmp/hallscope/InfoVQA/train
+
+dataset: InfoVQA
+batch_size: 1
+image_shape: "900,900"

@@ -4,5 +4,6 @@ save_path: /root/autodl-tmp/hallscope/AOKVQA/train
 
 dataset: AOKVQA
 split: train
+num_samples: 5000
 image_shape: "600,640"
 batch_size: 1

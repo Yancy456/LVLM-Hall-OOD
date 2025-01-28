@@ -9,18 +9,17 @@ from datasets import Dataset
 import json
 
 
-class AOKVQADataset():
-    def __init__(self, split: Literal['train', 'validation']):
+class InfoVQADataset():
+    def __init__(self):
         '''Multiple-choices answering dataset'''
-        self.split = split
-        self.dataset = load_dataset('HuggingFaceM4/A-OKVQA', split=split)
+        self.dataset = load_dataset('vidore/infovqa_train', split='train')
 
     def get_data(self) -> Dataset:
 
         def transform(x):
             x['img'] = x['image']
-            x['answer'] = x['direct_answers']
-            x['question'] = f"{x['question']}\nAnswer the question using a single word or phrase.\n"
+            x['answer'] = x['answer']
+            x['question'] = f"{x['query']}\nAnswer the question using a single word or phrase.\n"
             return x
 
         data = self.dataset.map(transform, num_proc=8)
