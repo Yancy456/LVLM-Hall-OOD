@@ -30,3 +30,5 @@ python main.py --config /home/hallscope/configs/ChartVQA/train.yaml
 python main.py --config /home/hallscope/configs/DocVQA/train.yaml
 
 python main.py --config /home/hallscope/configs/InfoVQA/train.yaml
+
+python main.py --config /home/hallscope/configs/VQAIDK/train_qwen.yaml

@@ -6,7 +6,7 @@ import json
 from tqdm import tqdm
 
 
-class VQADataset():
+class VQAIDKDataset():
     def __init__(self, annotation_path: str, data_folder: str):
         self.ann_path = annotation_path
         self.img_root = data_folder

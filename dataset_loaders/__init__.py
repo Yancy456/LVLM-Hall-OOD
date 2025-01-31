@@ -18,6 +18,7 @@ from .AOKVQA import AOKVQADataset
 from .ChartVQA import ChartVQADataset
 from .DocVQA import DocVQADataset
 from .InfoVQA import InfoVQADataset
+from .VQA_IDK import VQAIDKDataset
 
 
 def load_data(dataset_name: str, args):
@@ -52,6 +53,9 @@ def load_data(dataset_name: str, args):
         data = DocVQADataset(args.annotation_path, args.data_folder).get_data()
     elif dataset_name == 'InfoVQA':
         data = InfoVQADataset().get_data()
+    elif dataset_name == 'VQAIDK':
+        data = VQAIDKDataset(args.annotation_path,
+                             args.data_folder).get_data()
     else:
         raise ValueError(f'No such dataset {dataset_name}')
 
