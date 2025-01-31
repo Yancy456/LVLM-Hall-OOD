@@ -78,19 +78,28 @@ class KernelPCA:
         '''
 
         X = self._kernel_projection(X, M, gamma, method)
-        pca_model = PCA(n_components=n_components, whiten=False).fit(X)
-        projections = pca_model.singular_values_*pca_model.components_.T
-        mean_recorded = pca_model.mean_
+        pca = PCA(n_components=n_components, whiten=False).fit(X)
+        projections = pca.singular_values_*pca.components_.T
+        mean_recorded = pca.mean_
 
         self.X = X
         self.projections = projections
+        self.M = M
+        self.method = method
+        self.gamma = gamma
+        self.pca = pca
 
     def get_score(self, X):
+        X = self._kernel_projection(X, self.M, self.gamma, self.method)
         scores = np.mean(
             np.matmul(X, self.projections), -1, keepdims=True)
         assert scores.shape[1] == 1
         scores = np.sqrt(np.sum(np.square(scores), axis=1))
         return scores  # scores.shape=(num_samples)
+
+    def transform(self, X):
+        X = self._kernel_projection(X, self.M, self.gamma, self.method)
+        return self.pca.transform(X)
 
     def get_best_split(self, scores, y):
         '''get best split from scores'''
