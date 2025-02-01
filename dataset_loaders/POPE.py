@@ -12,15 +12,9 @@ from tqdm import tqdm
 
 
 class POPEDataset():
-    def __init__(self, annotation_path: str, data_folder: str,
-                 split: Literal['train', 'val', 'test'], category: Literal["adversarial", "popular", "random"]):
-
+    def __init__(self, annotation_path: str, data_folder: str):
         self.ann_path = annotation_path
         self.img_root = data_folder
-        self.split = split
-        self.category = category
-        if category not in ["adversarial", "popular", "random"]:  # check category value
-            raise ValueError(f'No such {category} in POPE dataset!')
 
     def get_data(self) -> list:
         ann = read_jsonl(self.ann_path)
@@ -30,7 +24,6 @@ class POPEDataset():
                 "question": f"{ins['text']}\nAnswer the question using a single word or phrase.",
                 "label": 0 if ins['label'] == 'no' else 1,  # 1 yes; 0 no
                 "question_id": ins["question_id"],
-                "category": self.category
             }
             for ins in ann
         ]

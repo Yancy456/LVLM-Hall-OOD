@@ -22,6 +22,7 @@ import os
 import warnings
 from dataset_loaders.VQA import VQADataset
 from dataset_loaders.ChartVQA import ChartVQADataset
+from dataset_loaders.POPE import POPEDataset
 warnings.filterwarnings("ignore")
 
 
@@ -44,7 +45,8 @@ BENCHMARK_MAP = {
     'MMMU': MMMU,
     'ScienceQA': ScienceQA,
     'VQA': lambda: VQADataset('/home/hallscope/data/VQA/v2_train.json', '/root/autodl-fs/coco_images/train', 'train'),
-    'ChartVQA': lambda: ChartVQADataset('/root/autodl-tmp/ChartVQA/train/train_augmented.json', '/root/autodl-tmp/ChartVQA/train/png')
+    'ChartVQA': lambda: ChartVQADataset('/root/autodl-tmp/ChartVQA/train/train_augmented.json', '/root/autodl-tmp/ChartVQA/train/png'),
+    'POPE-Adv': lambda: POPEDataset('/home/hallscope/data/pope/coco_train/coco_train_pope_adversarial.jsonl', '/root/autodl-fs/coco_images/train')
 }
 
 LLM_MAP = {

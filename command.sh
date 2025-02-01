@@ -8,6 +8,7 @@ python main.py --config ./configs/pope/train_random.yaml
 python main.py --config ./configs/pope/val_random.yaml
 
 python main.py --config ./configs/pope/train_adversarial_qwen.yaml
+python main.py --config ./configs/pope/train_popular_qwen.yaml
 
 
 python main.py --config ./configs/ScienceQA/train.yaml

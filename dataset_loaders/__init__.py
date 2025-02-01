@@ -32,7 +32,7 @@ def load_data(dataset_name: str, args):
 
     if dataset_name == 'POPE':
         data = POPEDataset(args.annotation_path,
-                           args.data_folder, args.split, args.category).get_data()
+                           args.data_folder).get_data()
     elif dataset_name == 'MMSafety':
         data = MMSafetyBench(
             args.prompter, args.data_folder, args.split).get_data()
