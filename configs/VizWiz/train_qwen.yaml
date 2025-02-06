@@ -1,10 +1,10 @@
-model_name: LLaVA-7B
-model_path: /root/autodl-tmp/llava-1.5-7b-hf
-save_path: /root/autodl-tmp/hallscope/VizWiz/multi/train
+model_name: QWen2-VL
+model_path: Qwen/Qwen2-VL-7B-Instruct
+save_path: /root/autodl-tmp/hallscope/VizWiz/train
 
 dataset: VizWiz
 annotation_path: /root/autodl-fs/vizwiz/Annotations/Annotations/train.json
 data_folder: /root/autodl-fs/vizwiz/train/train
 image_shape: "500,500"
 batch_size: 1
-num_samples: 8000
+num_samples: 10000

@@ -56,7 +56,7 @@ def main(args):
 
 if __name__ == "__main__":
     arguments = Arguments(
-        '/home/hallscope/configs/pope/train_adversarial_qwen.yaml')
+        '/home/hallscope/configs/pope/train_random_llava.yaml')
     args = arguments.get_config()
     fix_seed(0)
     main(args)
