@@ -7,5 +7,5 @@ annotation_path: /home/hallscope/data/pope/coco_train/coco_train_pope_adversaria
 data_folder: /root/autodl-fs/coco_images/train
 split: train
 category: adversarial
-num_samples: 10000
+num_samples: 5000
 batch_size: 1
