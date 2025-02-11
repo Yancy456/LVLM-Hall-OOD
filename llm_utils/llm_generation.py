@@ -32,7 +32,7 @@ class LLMGeneration():
         hidden_states = self.phrase_hidden_states(outputs.hidden_states)
 
         most_likely_response = self.processor.batch_decode(
-            outputs.sequences)
+            outputs.sequences, skip_special_tokens=True)
         most_likely_response = self.phrase_responses(
             most_likely_response, prompts, 1)
 
@@ -62,7 +62,7 @@ class LLMGeneration():
             outputs = self.model.generate(
                 **inputs, **config)
             all_responses = self.processor.batch_decode(
-                outputs.sequences)
+                outputs.sequences, skip_special_tokens=True)
             all_responses = self.phrase_responses(
                 all_responses, prompts, args.n_multi_gene)
 
@@ -94,8 +94,13 @@ class LLMGeneration():
 
             prompts = [apply_to_template(x) for x in batch_prompts]
             # WARNING: do_rescale MUST be False, because transforms.ToTensor() already done that
-            inputs = self.processor(images=images, text=prompts,
-                                    return_tensors='pt', padding=True, do_rescale=False).to(0, torch.float16)
+            if len(prompts) == 1:
+                inputs = self.processor(images=images[0], text=prompts[0],
+                                        return_tensors='pt', padding=True, do_rescale=False).to(0, torch.float16)
+            else:
+                inputs = self.processor(images=images, text=prompts,
+                                        return_tensors='pt', padding=True, do_rescale=False).to(0, torch.float16)
+
             return inputs, prompts
         else:
             # Language Model
@@ -125,9 +130,10 @@ class LLMGeneration():
         '''remove reluctant words and only keep response without prompts'''
         def phraser(i, x):
             prompt = prompts[i]
+            prompt = prompt.replace("<image>", " ")
             x = x[len(prompt):]
             x = x.replace("<pad>", "").replace(
-                "</s>", "").replace("<unk>", "").replace("<|im_end|>", "").strip()
+                "</s>", "").replace("<unk>", "").replace("<|im_end|>", "").replace("<image>", " ").strip()
             return x
 
         rsps = []
