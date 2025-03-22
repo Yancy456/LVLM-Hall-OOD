@@ -1,8 +1,0 @@
-model_name: QWen2-VL
-model_path: Qwen/Qwen2-VL-7B-Instruct
-save_path: /root/autodl-tmp/hallscope/selfeval/pope_adversarial
-
-dataset: SelfEval
-annotation_path: /home/hallscope/pope_adversarial_resp.json
-num_samples: 2000
-batch_size: 1
