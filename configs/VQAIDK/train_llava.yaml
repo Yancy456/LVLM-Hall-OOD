@@ -1,0 +1,11 @@
+model_name: LLaVA
+model_path: llava-hf/llava-v1.6-mistral-7b-hf
+save_path: /root/autodl-tmp/hallscope/VQAIDK/train
+
+dataset: VQAIDK
+annotation_path: /home/hallscope/data/VQAIDK/VQA_IDK.json
+data_folder: /root/autodl-fs/coco_images/train
+return_logits: False
+batch_size: 1
+image_shape: "640,480"
+num_samples: 5000

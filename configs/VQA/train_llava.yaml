@@ -8,4 +8,4 @@ data_folder: /root/autodl-fs/coco_images/train
 split: train
 batch_size: 1
 image_shape: "640,480"
-num_samples: 2000
+num_samples: 5000

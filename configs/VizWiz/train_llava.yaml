@@ -1,0 +1,10 @@
+model_name: LLaVA
+model_path: llava-hf/llava-v1.6-mistral-7b-hf
+save_path: /root/autodl-tmp/hallscope/VizWiz/train
+
+dataset: VizWiz
+annotation_path: /root/autodl-fs/vizwiz/Annotations/Annotations/train.json
+data_folder: /root/autodl-fs/vizwiz/train/train
+image_shape: "500,500"
+batch_size: 1
+num_samples: 5000
