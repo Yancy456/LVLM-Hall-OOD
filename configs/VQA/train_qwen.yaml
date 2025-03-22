@@ -3,8 +3,8 @@ model_path: Qwen/Qwen2-VL-7B-Instruct
 save_path: /root/autodl-tmp/hallscope/VQA/train_qwen
 
 dataset: VQA
-annotation_path: /home/hallscope/data/VQA/v2_train.json
-data_folder: /root/autodl-fs/coco_images/train
+# annotation_path: /home/hallscope/data/VQA/v2_train.json
+# data_folder: /root/autodl-fs/coco_images/train
 split: train
 batch_size: 1
 image_shape: "640,480"
