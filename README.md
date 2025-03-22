@@ -22,7 +22,7 @@ Don't worry. We are trying our best to make the process very simple for you.
 #### 1. Download the dataset
 - Task 1. Detect hallucinations in visual-answering dataset: VQA v2. Download the annotation file from [here](https://s3.amazonaws.com/cvmlp/vqa/mscoco/vqa/v2_Questions_Train_mscoco.zip). Donwload coco2014 dataset from [Kaggle](https://www.kaggle.com/datasets/yashfinulhoque/coco-dataset-2014) or [offical website](https://visualqa.org/download.html). Modify the *annotation_path* and *data_folder*  to the annotation json file and the folder of coco2014 training set respectly.
 
-After downloading and unzipping data, please modify dataset paths [here] (https://github.com/Yancy456/LVLM-Hall-OOD/tree/master/configs/VQA).
+After downloading and unzipping data, please modify dataset paths [here](https://github.com/Yancy456/LVLM-Hall-OOD/tree/master/configs/VQA).
 
 #### 2. Run on different tasks
 
