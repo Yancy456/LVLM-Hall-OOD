@@ -1,8 +1,6 @@
-# **Rethinking Hallucination Detection in Large Vision-Language Models From An Out-of-Distribution Perspective**
+## **Rethinking Hallucination Detection in Large Vision-Language Models From An Out-of-Distribution Perspective**
 
 This repository contains the source code for the paper *Rethinking Hallucination Detection in Large Vision-Language Models From An Out-of-Distribution Perspective*.
-
-## Getting Started
 
 ### Installation
 ```bash
@@ -24,7 +22,7 @@ Don't worry. We are trying our best to make the process very simple for you.
 
 After downloading and unzipping data, please modify dataset paths [here](https://github.com/Yancy456/LVLM-Hall-OOD/tree/master/configs/VQA).
 
-#### 2. Run on different tasks
+#### 2. Reference on different tasks
 
 OK, life goes very easy at this stage. We provide you all configurations for running models on each task. Please find them [here](https://github.com/Qinyu-Allen-Zhao/LVLM-LP/tree/main/scripts).
 
