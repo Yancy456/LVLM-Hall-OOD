@@ -28,8 +28,8 @@ OK, life goes very easy at this stage. We provide you all configurations for run
 
 For example, run this command (modify it based on your gpu numbers)
 
-```
-CUDA_VISIBLE_DEVICES=0,1,2,3 bash ./scripts/VizWiz/run_LLaVA_7B.sh
+```bash
+python main.py --config ./configs/VQA/train_qwen.yaml # change the config path for different tasks.
 ```
 
 #### 3. Evaluate results
