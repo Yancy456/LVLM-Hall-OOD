@@ -2,7 +2,7 @@
 
 This repository contains the source code for the paper *Rethinking Hallucination Detection in Large Vision-Language Models From An Out-of-Distribution Perspective*.
 
-![Paper](paper.png)
+<img src="paper.png" width="70%" alt="Paper">
 
 ### Installation
 ```bash
