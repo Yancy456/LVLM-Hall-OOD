@@ -2,6 +2,8 @@
 
 This repository contains the source code for the paper *Rethinking Hallucination Detection in Large Vision-Language Models From An Out-of-Distribution Perspective*.
 
+![Paper](paper.png)
+
 ### Installation
 ```bash
 git clone https://github.com/Yancy456/LVLM-Hall-OOD.git
@@ -34,4 +36,4 @@ python main.py --config ./configs/VQA/train_qwen.yaml # change the config path f
 
 #### 3. Evaluate results
 
-Please refer to those eval.ipynb files.
+Please refer to VQA_detection_kernel.ipynb file.

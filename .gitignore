@@ -5,7 +5,6 @@ output/*
 nohup.out
 *.json
 *.jpg
-*.png
 API/*
 *.zip
 *.npy
