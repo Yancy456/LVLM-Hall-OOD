@@ -11,7 +11,7 @@ cd LVLM-Hall-OOD
 
 conda create -n LVLM-OOD python=3.9
 conda activate LVLM-OOD
-pip pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Usage
